@@ -19,7 +19,7 @@ namespace Proyecto2_Compiladores2.Analizador
             var array_res = ToTerm("array");
             #endregion
 
-            #region EXPRESIONes Regulares
+            #region EXPRESIONES Regulares
             RegexBasedTerminal N_entero = new RegexBasedTerminal("entero", @"-?[0-9]+");
             StringLiteral cadena = new StringLiteral("cadena", "\'", StringOptions.AllowsLineBreak);
             RegexBasedTerminal N_real = new RegexBasedTerminal("real", @"-?[0-9]+(\.[0-9]+)");
