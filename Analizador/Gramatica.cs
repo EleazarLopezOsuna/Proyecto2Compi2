@@ -97,10 +97,6 @@ namespace Proyecto2_Compiladores2.Analizador
             NonTerminal T_ESTRUCTURADO = new NonTerminal("T_ESTRUCTURADO");
             NonTerminal T_ORDINAL = new NonTerminal("T_ORDINAL");
             NonTerminal VARIABLE = new NonTerminal("VARIABLE");
-            NonTerminal Z_CONSTANTES = new NonTerminal("Z_CONSTANTES");
-            NonTerminal Z_VARIABLES = new NonTerminal("Z_VARIABLES");
-            NonTerminal Z_DECLARACIONES = new NonTerminal("Z_DECLARACIONES");
-            NonTerminal Z_TIPOS = new NonTerminal("Z_TIPOS");
             NonTerminal Z_CONSTANTES_P = new NonTerminal("Z_CONSTANTES");
             NonTerminal Z_SUBPROGRAMAS_P = new NonTerminal("Z_SUBPROGRAMAS");
             NonTerminal Z_VARIABLES_P = new NonTerminal("Z_VARIABLES");
@@ -163,10 +159,10 @@ namespace Proyecto2_Compiladores2.Analizador
                 | id + ToTerm(":") + T_DATO + ToTerm("=") + EXPRESION
                 ;
 
-            FUNCION.Rule = FUNCION_HEAD + Z_DECLARACIONES + BEGIN_END
+            FUNCION.Rule = FUNCION_HEAD + Z_DECLARACIONES_P + BEGIN_END
                 ;
 
-            PROCEDIMIENTO.Rule = PROCEDIMIENTO_HEAD + Z_DECLARACIONES + BEGIN_END
+            PROCEDIMIENTO.Rule = PROCEDIMIENTO_HEAD + Z_DECLARACIONES_P + BEGIN_END
                 ;
 
             SUBPROGRAMA.Rule = FUNCION
@@ -396,27 +392,6 @@ namespace Proyecto2_Compiladores2.Analizador
                 | id + ToTerm("=") + T_DATO + R_TYPE + Z_DECLARACIONES_P
                 ;
 
-            Z_CONSTANTES.Rule = Empty
-                | ToTerm("const") + D_CONSTANTE + R_CONSTANTE + Z_DECLARACIONES
-                | D_CONSTANTE + R_CONSTANTE + Z_DECLARACIONES
-                ;
-
-            Z_VARIABLES.Rule = Empty
-                | ToTerm("var") + D_VARIABLE + R_VARIABLE + Z_DECLARACIONES
-                | D_VARIABLE + R_VARIABLE + Z_DECLARACIONES
-                ;
-
-            Z_DECLARACIONES.Rule = Z_CONSTANTES
-                | Z_TIPOS
-                | Z_VARIABLES
-                | Empty
-                ;
-
-            Z_TIPOS.Rule = Empty
-                | ToTerm("type") + id + ToTerm("=") + T_DATO + R_TYPE + Z_DECLARACIONES
-                | id + ToTerm("=") + T_DATO + R_TYPE + Z_DECLARACIONES
-                ;
-
             #endregion
 
             #region Preferencias
@@ -424,7 +399,7 @@ namespace Proyecto2_Compiladores2.Analizador
             this.MarkPunctuation(",", "(", ")", "[", "]", ":", ";", ".", "..", ":=", "program");
             this.MarkPunctuation("type", "program", "var", "const", "begin", "end", "of", "procedure", "function");
             this.MarkPunctuation("case", "do", "else", "for", "repeat", "then", "until", "while", "if", "to", "downto");
-            this.MarkTransient(VALOR, SUBPROGRAMA, Z_DECLARACIONES, VARIABLE, T_ELEMENTAL, SENTENCIA, PF, PA, OU, OB, CONTROLADOR);
+            this.MarkTransient(VALOR, SUBPROGRAMA, VARIABLE, T_ELEMENTAL, SENTENCIA, PF, PA, OU, OB, CONTROLADOR);
             #endregion
         }
     }
