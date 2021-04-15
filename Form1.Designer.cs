@@ -42,14 +42,17 @@ namespace Proyecto2_Compiladores2
             this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.table_label = new System.Windows.Forms.Label();
             this.symbol_table = new System.Windows.Forms.DataGridView();
+            this.label2 = new System.Windows.Forms.Label();
+            this.console_textbox = new System.Windows.Forms.TextBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Tipo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Ambito = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Rol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Absoluta = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Relativa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fila = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Columna = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Valor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label2 = new System.Windows.Forms.Label();
-            this.console_textbox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.error_table)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.symbol_table)).BeginInit();
             this.SuspendLayout();
@@ -62,6 +65,7 @@ namespace Proyecto2_Compiladores2
             this.button1.TabIndex = 0;
             this.button1.Text = "Open File";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -71,6 +75,7 @@ namespace Proyecto2_Compiladores2
             this.button2.TabIndex = 1;
             this.button2.Text = "Run";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
@@ -94,10 +99,10 @@ namespace Proyecto2_Compiladores2
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("BubbleGum", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label1.Location = new System.Drawing.Point(12, 80);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(64, 24);
+            this.label1.Size = new System.Drawing.Size(72, 29);
             this.label1.TabIndex = 8;
             this.label1.Text = "Code";
             // 
@@ -121,7 +126,7 @@ namespace Proyecto2_Compiladores2
             this.dataGridViewTextBoxColumn3,
             this.dataGridViewTextBoxColumn4,
             this.dataGridViewTextBoxColumn5});
-            this.error_table.Location = new System.Drawing.Point(583, 397);
+            this.error_table.Location = new System.Drawing.Point(583, 402);
             this.error_table.Name = "error_table";
             this.error_table.ReadOnly = true;
             this.error_table.RowTemplate.Height = 25;
@@ -164,10 +169,10 @@ namespace Proyecto2_Compiladores2
             // table_label
             // 
             this.table_label.AutoSize = true;
-            this.table_label.Font = new System.Drawing.Font("BubbleGum", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.table_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.table_label.Location = new System.Drawing.Point(583, 370);
             this.table_label.Name = "table_label";
-            this.table_label.Size = new System.Drawing.Size(169, 24);
+            this.table_label.Size = new System.Drawing.Size(163, 29);
             this.table_label.TabIndex = 16;
             this.table_label.Text = "Symbol Table";
             this.table_label.Visible = false;
@@ -181,10 +186,12 @@ namespace Proyecto2_Compiladores2
             this.Nombre,
             this.Tipo,
             this.Ambito,
+            this.Rol,
+            this.Absoluta,
+            this.Relativa,
             this.Fila,
-            this.Columna,
-            this.Valor});
-            this.symbol_table.Location = new System.Drawing.Point(583, 397);
+            this.Columna});
+            this.symbol_table.Location = new System.Drawing.Point(583, 402);
             this.symbol_table.Name = "symbol_table";
             this.symbol_table.ReadOnly = true;
             this.symbol_table.RowTemplate.Height = 25;
@@ -192,6 +199,30 @@ namespace Proyecto2_Compiladores2
             this.symbol_table.Size = new System.Drawing.Size(760, 242);
             this.symbol_table.TabIndex = 15;
             this.symbol_table.Visible = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label2.Location = new System.Drawing.Point(583, 75);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(103, 29);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "Console";
+            // 
+            // console_textbox
+            // 
+            this.console_textbox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.console_textbox.Location = new System.Drawing.Point(583, 105);
+            this.console_textbox.Multiline = true;
+            this.console_textbox.Name = "console_textbox";
+            this.console_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.console_textbox.Size = new System.Drawing.Size(760, 242);
+            this.console_textbox.TabIndex = 13;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // Nombre
             // 
@@ -215,6 +246,28 @@ namespace Proyecto2_Compiladores2
             this.Ambito.Name = "Ambito";
             this.Ambito.ReadOnly = true;
             this.Ambito.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Ambito.Width = 150;
+            // 
+            // Rol
+            // 
+            this.Rol.HeaderText = "Rol";
+            this.Rol.Name = "Rol";
+            this.Rol.ReadOnly = true;
+            this.Rol.Width = 105;
+            // 
+            // Absoluta
+            // 
+            this.Absoluta.HeaderText = "A";
+            this.Absoluta.Name = "Absoluta";
+            this.Absoluta.ReadOnly = true;
+            this.Absoluta.Width = 50;
+            // 
+            // Relativa
+            // 
+            this.Relativa.HeaderText = "R";
+            this.Relativa.Name = "Relativa";
+            this.Relativa.ReadOnly = true;
+            this.Relativa.Width = 50;
             // 
             // Fila
             // 
@@ -222,7 +275,7 @@ namespace Proyecto2_Compiladores2
             this.Fila.Name = "Fila";
             this.Fila.ReadOnly = true;
             this.Fila.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Fila.Width = 40;
+            this.Fila.Width = 50;
             // 
             // Columna
             // 
@@ -230,35 +283,7 @@ namespace Proyecto2_Compiladores2
             this.Columna.Name = "Columna";
             this.Columna.ReadOnly = true;
             this.Columna.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Columna.Width = 40;
-            // 
-            // Valor
-            // 
-            this.Valor.HeaderText = "Valor";
-            this.Valor.Name = "Valor";
-            this.Valor.ReadOnly = true;
-            this.Valor.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Valor.Width = 274;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("BubbleGum", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(583, 80);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(106, 24);
-            this.label2.TabIndex = 14;
-            this.label2.Text = "Console";
-            // 
-            // console_textbox
-            // 
-            this.console_textbox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.console_textbox.Location = new System.Drawing.Point(583, 107);
-            this.console_textbox.Multiline = true;
-            this.console_textbox.Name = "console_textbox";
-            this.console_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.console_textbox.Size = new System.Drawing.Size(760, 242);
-            this.console_textbox.TabIndex = 13;
+            this.Columna.Width = 50;
             // 
             // Form1
             // 
@@ -300,14 +325,17 @@ namespace Proyecto2_Compiladores2
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
         private System.Windows.Forms.Label table_label;
         private System.Windows.Forms.DataGridView symbol_table;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox console_textbox;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
         private System.Windows.Forms.DataGridViewTextBoxColumn Tipo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Ambito;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Rol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Absoluta;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Relativa;
         private System.Windows.Forms.DataGridViewTextBoxColumn Fila;
         private System.Windows.Forms.DataGridViewTextBoxColumn Columna;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Valor;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox console_textbox;
     }
 }
 
