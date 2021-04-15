@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Irony.Parsing;
 
 namespace Proyecto2_Compiladores2.Modelos
 {
@@ -12,8 +13,9 @@ namespace Proyecto2_Compiladores2.Modelos
         public bool constante;
         public int direccionAbsoluta;
         public int direccionRelativa;
+        public ParseTreeNode root;
 
-        public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna)
+        public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root)
         {
             this.tipo = tipo;
             this.constante = false;
@@ -21,6 +23,7 @@ namespace Proyecto2_Compiladores2.Modelos
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
             this.columna = columna;
+            this.root = root;
         }
 
         public enum EnumTipo

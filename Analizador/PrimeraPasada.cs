@@ -72,19 +72,19 @@ namespace Proyecto2_Compiladores2.Analizador
                                 //         0           1   2    3
                                 if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("real"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("boolean"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("integer"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -96,7 +96,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                     }
                                 }
                                 if (simbolo is null) { }
@@ -123,19 +123,19 @@ namespace Proyecto2_Compiladores2.Analizador
                                 ParseTreeNode temp = root;
                                 if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("real"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("boolean"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("integer"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("string"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -147,7 +147,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                     }
                                 }
                                 if (simbolo is null) { }
@@ -157,7 +157,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         while (temp.ChildNodes.Count != 0)
                                         {
-                                            if (!entorno.insertar(removerExtras(temp.ChildNodes[0].ToString()), new Simbolo(simbolo.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, temp.ChildNodes[0].Token.Location.Line, temp.ChildNodes[0].Token.Location.Column)))
+                                            if (!entorno.insertar(removerExtras(temp.ChildNodes[0].ToString()), new Simbolo(simbolo.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, temp.ChildNodes[0].Token.Location.Line, temp.ChildNodes[0].Token.Location.Column, simbolo.root)))
                                             {
                                                 Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                                 errores.Add(error);
@@ -178,19 +178,19 @@ namespace Proyecto2_Compiladores2.Analizador
                                 ParseTreeNode temp = root;
                                 if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("real"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("boolean"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("integer"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -202,7 +202,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
                                     }
                                 }
                                 if (simbolo is null)
@@ -242,19 +242,19 @@ namespace Proyecto2_Compiladores2.Analizador
                                 //         0           1   2    3
                                 if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("real"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("boolean"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("integer"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -266,7 +266,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
                                     }
                                 }
                                 if (simbolo is null) { }
@@ -293,19 +293,19 @@ namespace Proyecto2_Compiladores2.Analizador
                                 //           0        1    2
                                 if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("real"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("boolean"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("integer"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("string"))
                                 {
-                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                    simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -317,7 +317,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column);
+                                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta + posicionRelativa, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
                                     }
                                 }
                                 if (simbolo is null) { }

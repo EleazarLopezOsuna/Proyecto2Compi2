@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Irony.Parsing;
 using Proyecto2_Compiladores2.Analizador;
 using Proyecto2_Compiladores2.Modelos;
+using Proyecto2_Compiladores2.Traduccion;
 
 namespace Proyecto2_Compiladores2
 {
@@ -15,6 +16,7 @@ namespace Proyecto2_Compiladores2
         private string fileName;
         private ParseTree resultadoAnalisis = null;
         private int posicionAbsoluta;
+        private int contadorTemporal;
 
         public Form1()
         {
@@ -51,6 +53,7 @@ namespace Proyecto2_Compiladores2
             symbol_table.Rows.Clear();
             console_textbox.Text = "";
             posicionAbsoluta = 0;
+            contadorTemporal = 0;
 
             if (resultadoAnalisis != null)
             {
@@ -58,11 +61,13 @@ namespace Proyecto2_Compiladores2
                 {
                     PrimeraPasada corridaUno = new PrimeraPasada();
                     corridaUno.iniciarPrimeraPasada(resultadoAnalisis.Root, posicionAbsoluta);
+                    Declaracion tradurcirDeclaracion = new Declaracion(contadorTemporal);
                     if (corridaUno.errores.Count == 0)
                     {
                         //No existieron errores al momento de crear las variables
                         Simbolo variable;
                         string tipo;
+                        Object[] traduccionVariable;
                         foreach (KeyValuePair<string, Simbolo> llave in corridaUno.entornoGlobal.tabla)
                         {
                             tipo = "Variable";
@@ -70,6 +75,9 @@ namespace Proyecto2_Compiladores2
                             if (variable.constante)
                                 tipo = "Constante";
                             symbol_table.Rows.Add(llave.Key, variable.tipo, "Global", tipo, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                            traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal);
+                            contadorTemporal = int.Parse(traduccionVariable[0].ToString());
+                            console_textbox.Text += traduccionVariable[1] + Environment.NewLine;
                         }
                         symbol_table.Visible = true;
                     }

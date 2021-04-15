@@ -22,7 +22,7 @@ namespace Proyecto2_Compiladores2.Modelos
             parametrosValor = new Dictionary<string, Simbolo>();
             parametrosVariable = new Dictionary<string, Simbolo>();
             correlacionParametros = new Dictionary<string, string>();
-            retorno = new Simbolo(Simbolo.EnumTipo.nulo, direccionAbsoluta, direccionAbsoluta, fila, columna);
+            retorno = new Simbolo(Simbolo.EnumTipo.nulo, direccionAbsoluta, direccionAbsoluta, fila, columna, root);
             tipo = Simbolo.EnumTipo.nulo;
             this.entorno = entorno;
             ordenParametros = new ArrayList();
