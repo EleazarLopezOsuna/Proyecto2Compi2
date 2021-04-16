@@ -8,7 +8,7 @@ namespace Proyecto2_Compiladores2.Traduccion
 {
     class Declaracion
     {
-        int contadorTemporal;
+        public int contadorTemporal;
         public Declaracion(int contadorTemporal) {
             this.contadorTemporal = contadorTemporal;
         }
@@ -59,7 +59,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                 {
                     //Es una variable, debemos buscar su valor
                     simbolo = entorno.buscar(removerExtras(root.ChildNodes[0].ChildNodes[0].ToString()));
-                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "]";
+                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "];";
                     return traduccion;
                 }
                 else if (root.ChildNodes[0].ToString().Equals("EXPRESION"))
@@ -70,20 +70,20 @@ namespace Proyecto2_Compiladores2.Traduccion
                 else
                 {
                     //Es un valor puntual, no debemos de buscar nada
-                    return removerExtras(root.ChildNodes[0].ToString());
+                    return removerExtras(root.ChildNodes[0].ToString()) + ";";
                 }
             }
             else if (root.ChildNodes.Count == 3)
             {
                 //Es una operacion binaria OPERADOR1 (+, -, * , /, %, AND, OR, >, <, >=, <=, <>, =) OPERADOR2
-                string operador1 = ResolverExpresion(root.ChildNodes[0], entorno) + ";";
+                string operador1 = ResolverExpresion(root.ChildNodes[0], entorno);
                 if (!operador1.StartsWith("T"))
                 {
                     contadorTemporal++;
                     operador1 = "T" + contadorTemporal + " = " + operador1;
                 }
                 int temporalOperador1 = contadorTemporal;
-                string operador2 = ResolverExpresion(root.ChildNodes[2], entorno) + ";";
+                string operador2 = ResolverExpresion(root.ChildNodes[2], entorno);
                 if (!operador2.StartsWith("T"))
                 {
                     contadorTemporal++;
@@ -93,11 +93,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                 traduccion += operador1 + Environment.NewLine + operador2;
                 contadorTemporal++;
                 traduccion += Environment.NewLine + "T" + contadorTemporal + " = T" + temporalOperador1 + " " 
-                        + removerExtras(root.ChildNodes[1].ToString()) + " T" + temporalOperador2;
+                        + removerExtras(root.ChildNodes[1].ToString()) + " T" + temporalOperador2 + ";";
             }
             else if (root.ChildNodes.Count == 2)
             {
                 //Es una operacion unaria (NOT, -)OPERADOR1
+                string operador1 = ResolverExpresion(root.ChildNodes[1], entorno);
+                if (!operador1.StartsWith("T"))
+                {
+                    contadorTemporal++;
+                    operador1 = "T" + contadorTemporal + " = " + operador1;
+                }
+                contadorTemporal++;
+                string operador = removerExtras(root.ChildNodes[0].ToString());
+                if (operador.ToLower().Equals("not"))
+                    operador = "!";
+                traduccion += "T" + contadorTemporal + " = "  + operador + "T" + (contadorTemporal - 1);
             }
             return traduccion;
         }

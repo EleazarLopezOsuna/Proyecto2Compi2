@@ -68,6 +68,14 @@ namespace Proyecto2_Compiladores2
                         Simbolo variable;
                         string tipo;
                         Object[] traduccionVariable;
+                        string codigoTresDirecciones = "";
+                        string encabezado = "#include <stdio.h>" + Environment.NewLine +
+                            "float HEAP[100000];" + Environment.NewLine +
+                            "float STACK[100000];" + Environment.NewLine +
+                            "float SP;" + Environment.NewLine + 
+                            "float HP;" + Environment.NewLine +
+                            "float ";
+                        string cuerpo = "void main(){" + Environment.NewLine;
                         foreach (KeyValuePair<string, Simbolo> llave in corridaUno.entornoGlobal.tabla)
                         {
                             tipo = "Variable";
@@ -76,11 +84,28 @@ namespace Proyecto2_Compiladores2
                                 tipo = "Constante";
                             symbol_table.Rows.Add(llave.Key, variable.tipo, "Global", tipo, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
                             traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal);
-                            contadorTemporal = int.Parse(traduccionVariable[0].ToString());
-                            console_textbox.Text += traduccionVariable[1] + Environment.NewLine;
+                            if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
+                            {
+                                contadorTemporal = int.Parse(traduccionVariable[0].ToString());
+                            }
+                            tradurcirDeclaracion.contadorTemporal = 0;
+                            cuerpo += traduccionVariable[1] + Environment.NewLine;
                         }
+                        for(int i = 1; i <= contadorTemporal; i++)
+                        {
+                            if (i == 1)
+                                encabezado += "T" + i;
+                            else
+                                encabezado += ", T" + i;
+                        }
+                        encabezado += ";";
+                        cuerpo += "return;" + Environment.NewLine +
+                            "}";
+                        console_textbox.Text = encabezado + Environment.NewLine + cuerpo;
                         symbol_table.Visible = true;
                     }
+
+                    MessageBox.Show("Temporal maximo T" + contadorTemporal);
 
                     //Graficar Arbol Irony
                     Sintactico.crearImagen(resultadoAnalisis.Root);
