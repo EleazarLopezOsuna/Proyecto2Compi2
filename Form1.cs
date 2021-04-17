@@ -17,6 +17,7 @@ namespace Proyecto2_Compiladores2
         private ParseTree resultadoAnalisis = null;
         private int posicionAbsoluta;
         private int contadorTemporal;
+        private int contadorEtiqueta;
 
         public Form1()
         {
@@ -83,7 +84,7 @@ namespace Proyecto2_Compiladores2
                             if (variable.constante)
                                 tipo = "Constante";
                             symbol_table.Rows.Add(llave.Key, variable.tipo, "Global", tipo, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
-                            traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal);
+                            traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal, llave.Key);
                             if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
                             {
                                 contadorTemporal = int.Parse(traduccionVariable[0].ToString());
@@ -91,7 +92,14 @@ namespace Proyecto2_Compiladores2
                             tradurcirDeclaracion.contadorTemporal = 0;
                             cuerpo += traduccionVariable[1] + Environment.NewLine;
                         }
-                        for(int i = 1; i <= contadorTemporal; i++)
+                        SegundaPasada segundaPasada = new SegundaPasada(contadorEtiqueta);
+                        segundaPasada.iniciarSegundaPasada(resultadoAnalisis.Root, 0, corridaUno.entornoGlobal);
+                        if (segundaPasada.contadorTemporal > contadorTemporal)
+                            contadorTemporal = segundaPasada.contadorTemporal;
+                        cuerpo += segundaPasada.traduccion;
+                        cuerpo += "return;" + Environment.NewLine +
+                            "}";
+                        for (int i = 1; i <= contadorTemporal; i++)
                         {
                             if (i == 1)
                                 encabezado += "T" + i;
@@ -99,13 +107,9 @@ namespace Proyecto2_Compiladores2
                                 encabezado += ", T" + i;
                         }
                         encabezado += ";";
-                        cuerpo += "return;" + Environment.NewLine +
-                            "}";
                         console_textbox.Text = encabezado + Environment.NewLine + cuerpo;
                         symbol_table.Visible = true;
                     }
-
-                    MessageBox.Show("Temporal maximo T" + contadorTemporal);
 
                     //Graficar Arbol Irony
                     Sintactico.crearImagen(resultadoAnalisis.Root);
@@ -113,6 +117,7 @@ namespace Proyecto2_Compiladores2
                     Thread.Sleep(1000);
                     var p = new Process();
                     //Abrir imagen Irony
+
                     p.StartInfo = new ProcessStartInfo(@"C:\compiladores2\ArbolIrony.png")
                     {
                         UseShellExecute = true

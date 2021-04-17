@@ -32,6 +32,7 @@ namespace Proyecto2_Compiladores2.Analizador
 
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.CreateNoWindow = true;
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C dot -Tpng C:/compiladores2/ArbolIrony.dot -o C:/compiladores2/ArbolIrony.png";

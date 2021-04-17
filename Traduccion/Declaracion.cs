@@ -12,17 +12,18 @@ namespace Proyecto2_Compiladores2.Traduccion
         public Declaracion(int contadorTemporal) {
             this.contadorTemporal = contadorTemporal;
         }
-        public Object[] Traducir(Simbolo variable, Entorno entorno)
+        public Object[] Traducir(Simbolo variable, Entorno entorno, string nombreVariable)
         {
             Object[] retorno = new Object[2];
             string resultadoTraduccion = "";
             if (variable.root != null)
             {
-                resultadoTraduccion = ResolverExpresion(variable.root, entorno);
+                resultadoTraduccion += ResolverExpresion(variable.root, entorno);
                 if (!resultadoTraduccion.StartsWith("T"))
                 {
                     contadorTemporal++;
-                    resultadoTraduccion = "T" + contadorTemporal + " = " + resultadoTraduccion;
+                    resultadoTraduccion = "//Inicio de declaracion de identificador " + nombreVariable + Environment.NewLine +
+                        "T" + contadorTemporal + " = " + resultadoTraduccion;
                 }
             }
             else
@@ -30,7 +31,8 @@ namespace Proyecto2_Compiladores2.Traduccion
                 contadorTemporal++;
                 resultadoTraduccion = "T" + contadorTemporal + " = 0";
             }
-            resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";";
+            resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";" +
+                Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
             retorno[0] = contadorTemporal;
             retorno[1] = resultadoTraduccion;
             return retorno;
@@ -70,7 +72,15 @@ namespace Proyecto2_Compiladores2.Traduccion
                 else
                 {
                     //Es un valor puntual, no debemos de buscar nada
-                    return removerExtras(root.ChildNodes[0].ToString()) + ";";
+                    string res = removerExtras(root.ChildNodes[0].ToString()) + ";";
+                    if ((root.ChildNodes[0].ToString()).Contains("(boleano)"))
+                    {
+                        if (root.ChildNodes[0].ToString().Contains("false"))
+                            res = "0;";
+                        else
+                            res = "1;";
+                    }
+                    return res;
                 }
             }
             else if (root.ChildNodes.Count == 3)
@@ -92,8 +102,17 @@ namespace Proyecto2_Compiladores2.Traduccion
                 int temporalOperador2 = contadorTemporal;
                 traduccion += operador1 + Environment.NewLine + operador2;
                 contadorTemporal++;
+                string operador = removerExtras(root.ChildNodes[1].ToString());
+                if (operador.Equals("<>"))
+                    operador = "!=";
+                if (operador.Equals("="))
+                    operador = "==";
+                if (operador.ToLower().Equals("or"))
+                    operador = "||";
+                if (operador.ToLower().Equals("and"))
+                    operador = "&&";
                 traduccion += Environment.NewLine + "T" + contadorTemporal + " = T" + temporalOperador1 + " " 
-                        + removerExtras(root.ChildNodes[1].ToString()) + " T" + temporalOperador2 + ";";
+                        + operador + " T" + temporalOperador2 + ";";
             }
             else if (root.ChildNodes.Count == 2)
             {
