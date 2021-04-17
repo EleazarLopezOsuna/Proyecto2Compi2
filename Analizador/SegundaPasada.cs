@@ -49,6 +49,11 @@ namespace Proyecto2_Compiladores2.Analizador
         private void recorrer(ParseTreeNode root, Entorno entorno)
         {
             Simbolo simbolo = null;
+            string str;
+            int etiquetaSalidaIf;
+            int etiquetaVerdadera;
+            int etiquetaFalsa;
+            int etiquetaInicial;
             switch (root.ToString())
             {
                 case "PROGRAMA":
@@ -68,18 +73,20 @@ namespace Proyecto2_Compiladores2.Analizador
                         //if expresion then instrucciones else instrucciones
                         //      0                1                 2
                         traduccion += "//Inicio de calculo de la expresion condicional de IF" + Environment.NewLine;
-                        string str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                        declaracion.contadorTemporal = 0;
+                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
                         traduccion += str;
                         traduccion += "//Fin de calculo de la expresion condicional de IF" + Environment.NewLine;
-                        contadorTemporal = declaracion.contadorTemporal;
+                        if (declaracion.contadorTemporal > contadorTemporal)
+                            contadorTemporal = declaracion.contadorTemporal;
+                        contadorEtiqueta++;
+                        etiquetaVerdadera = contadorEtiqueta;
+                        traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
                         contadorEtiqueta++;
-                        int etiquetaVerdadera = contadorEtiqueta;
-                        traduccion += "if (T" + contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
+                        etiquetaSalidaIf = contadorEtiqueta;
                         contadorEtiqueta++;
-                        int etiquetaSalidaIf = contadorEtiqueta;
-                        contadorEtiqueta++;
-                        int etiquetaFalsa = contadorEtiqueta;
+                        etiquetaFalsa = contadorEtiqueta;
                         traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                         recorrer(root.ChildNodes[1], entorno);
@@ -94,16 +101,18 @@ namespace Proyecto2_Compiladores2.Analizador
                         //if expresion then instrucciones
                         //      0                1
                         traduccion += "//Inicio de calculo de la expresion condicional de IF" + Environment.NewLine;
-                        string str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                        declaracion.contadorTemporal = 0;
+                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
                         traduccion += str;
                         traduccion += "//Fin de calculo de la expresion condicional de IF" + Environment.NewLine;
-                        contadorTemporal = declaracion.contadorTemporal;
+                        if (declaracion.contadorTemporal > contadorTemporal)
+                            contadorTemporal = declaracion.contadorTemporal;
+                        contadorEtiqueta++;
+                        etiquetaVerdadera = contadorEtiqueta;
+                        traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
                         contadorEtiqueta++;
-                        int etiquetaVerdadera = contadorEtiqueta;
-                        traduccion += "if (T" + contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
-                        contadorEtiqueta++;
-                        int etiquetaFalsa = contadorEtiqueta;
+                        etiquetaFalsa = contadorEtiqueta;
                         traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                         recorrer(root.ChildNodes[1], entorno);
@@ -111,10 +120,36 @@ namespace Proyecto2_Compiladores2.Analizador
                         traduccion += "L" + etiquetaFalsa + ": //Salio del if" + Environment.NewLine;
                     }
                     break;
+                case "WHILE":
+                    //while expresion do instrucciones
+                    //         0              1
+                    contadorEtiqueta++;
+                    etiquetaInicial = contadorEtiqueta;
+                    traduccion += "L" + etiquetaInicial + ":" + Environment.NewLine;
+                    traduccion += "//Inicio de calculo de la expresion condicional del WHILE" + Environment.NewLine;
+                    declaracion.contadorTemporal = 0;
+                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                    traduccion += str;
+                    traduccion += "//Fin de calculo de la expresion condicional del WHILE" + Environment.NewLine;
+                    MessageBox.Show(declaracion.contadorTemporal.ToString());
+                    if (declaracion.contadorTemporal > contadorTemporal)
+                        contadorTemporal = declaracion.contadorTemporal;
+                    contadorEtiqueta++;
+                    etiquetaVerdadera = contadorEtiqueta;
+                    traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento hacia etiqueta de ejecucion del WHILE" + Environment.NewLine;
+                    contadorEtiqueta++;
+                    etiquetaFalsa = contadorEtiqueta;
+                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
+                    traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
+                    declaracion.contadorTemporal = 0;
+                    recorrer(root.ChildNodes[1], entorno);
+                    traduccion += "goto L" + etiquetaInicial + ";" + Environment.NewLine;
+                    traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
+                    break;
                 case "LLAMADA":
                     if (root.ChildNodes[0].ToString().Equals("writeln (id)"))
                     {
-                        traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "\");" + Environment.NewLine; //Eliminar luego, es solo para control
+                        traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "%c\", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
                     }
                     break;
                 case "ASIGNACION":
@@ -132,15 +167,30 @@ namespace Proyecto2_Compiladores2.Analizador
                             {
                                 //identificador := expresion
                                 //     0               1
-                                string str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+                                str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
                                 if (!str.StartsWith("T"))
                                 {
                                     contadorTemporal++;
                                     str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine +
                                         "T" + contadorTemporal + " = " + str;
                                 }
+                                else
+                                {
+                                    str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine + str;
+                                }
                                 traduccion += str;
-                                traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                if (declaracion.contadorTemporal > contadorTemporal)
+                                {
+                                    contadorTemporal = declaracion.contadorTemporal;
+                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                }
+                                else
+                                {
+                                    if (declaracion.contadorTemporal == 0)
+                                        declaracion.contadorTemporal = contadorTemporal;
+                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                }
+                                declaracion.contadorTemporal = 0;
                             }
                         }
                     }
