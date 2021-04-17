@@ -117,6 +117,34 @@ namespace Proyecto2_Compiladores2.Analizador
                         traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "\");" + Environment.NewLine; //Eliminar luego, es solo para control
                     }
                     break;
+                case "ASIGNACION":
+                    if (root.ChildNodes.Count == 2)
+                    {
+                        if (root.ChildNodes[0].ToString().Equals("VARIABLE"))
+                        {
+                            string nombreVariable = removerExtras(root.ChildNodes[0].ChildNodes[0].ToString());
+                            simbolo = entorno.buscar(removerExtras(nombreVariable));
+                            if (simbolo is null)
+                            {
+                                //AGREGAR ERROR La variable no existe
+                            }
+                            else
+                            {
+                                //identificador := expresion
+                                //     0               1
+                                string str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+                                if (!str.StartsWith("T"))
+                                {
+                                    contadorTemporal++;
+                                    str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine +
+                                        "T" + contadorTemporal + " = " + str;
+                                }
+                                traduccion += str;
+                                traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                            }
+                        }
+                    }
+                    break;
             }
         }
         private string removerExtras(string token)
