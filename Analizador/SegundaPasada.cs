@@ -54,6 +54,7 @@ namespace Proyecto2_Compiladores2.Analizador
             int etiquetaVerdadera;
             int etiquetaFalsa;
             int etiquetaInicial;
+            int etiquetaSalida;
             int tmp;
             string nombreVariable;
             switch (root.ToString())
@@ -86,17 +87,17 @@ namespace Proyecto2_Compiladores2.Analizador
                         traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
                         contadorEtiqueta++;
-                        etiquetaSalidaIf = contadorEtiqueta;
+                        etiquetaSalida = contadorEtiqueta;
                         contadorEtiqueta++;
                         etiquetaFalsa = contadorEtiqueta;
                         traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                         recorrer(root.ChildNodes[1], entorno);
-                        traduccion += "goto L" + etiquetaSalidaIf + "; //Movimiento a etiqueta de escape del if" + Environment.NewLine;
+                        traduccion += "goto L" + etiquetaSalida + "; //Movimiento a etiqueta de escape del if" + Environment.NewLine;
                         traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
                         recorrer(root.ChildNodes[2], entorno);
                         //Codigo para salir del if cuando fue verdadero
-                        traduccion += "L" + etiquetaSalidaIf + ": //Salio del if" + Environment.NewLine;
+                        traduccion += "L" + etiquetaSalida + ": //Salio del if" + Environment.NewLine;
                     }
                     else if (root.ChildNodes.Count == 2)
                     {
@@ -114,12 +115,12 @@ namespace Proyecto2_Compiladores2.Analizador
                         traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento a etiqueta verdadera" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
                         contadorEtiqueta++;
-                        etiquetaFalsa = contadorEtiqueta;
-                        traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
+                        etiquetaSalida = contadorEtiqueta;
+                        traduccion += "goto L" + etiquetaSalida + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                         recorrer(root.ChildNodes[1], entorno);
                         //Codigo para salir del if sin importar si fue verdadero o falso
-                        traduccion += "L" + etiquetaFalsa + ": //Salio del if" + Environment.NewLine;
+                        traduccion += "L" + etiquetaSalida + ": //Salio del if" + Environment.NewLine;
                     }
                     break;
                 case "WHILE":
@@ -139,13 +140,13 @@ namespace Proyecto2_Compiladores2.Analizador
                     etiquetaVerdadera = contadorEtiqueta;
                     traduccion += "if (T" + declaracion.contadorTemporal + ") goto L" + etiquetaVerdadera + "; //Movimiento hacia etiqueta de ejecucion del WHILE" + Environment.NewLine;
                     contadorEtiqueta++;
-                    etiquetaFalsa = contadorEtiqueta;
-                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
+                    etiquetaSalida = contadorEtiqueta;
+                    traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
                     recorrer(root.ChildNodes[1], entorno);
                     traduccion += "goto L" + etiquetaInicial + ";" + Environment.NewLine;
-                    traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
+                    traduccion += "L" + etiquetaSalida + ":" + Environment.NewLine;
                     break;
                 case "REPEAT":
                     // repeat instrucciones until condicion
@@ -166,9 +167,9 @@ namespace Proyecto2_Compiladores2.Analizador
                         contadorTemporal = declaracion.contadorTemporal;
                     traduccion += "if (T" + contadorTemporal + ") goto L" + etiquetaInicial + "; //Movimiento hacia el ciclo REPEAT" + Environment.NewLine;
                     contadorEtiqueta++;
-                    etiquetaFalsa = contadorEtiqueta;
-                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
-                    traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
+                    etiquetaSalida = contadorEtiqueta;
+                    traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
+                    traduccion += "L" + etiquetaSalida + ":" + Environment.NewLine;
                     break;
                 case "FOR":
                     // for asignacion TO-DOWNTO instrucciones
@@ -199,7 +200,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     contadorEtiqueta++;
                     etiquetaVerdadera = contadorEtiqueta;
                     contadorEtiqueta++;
-                    etiquetaFalsa = contadorEtiqueta;
+                    etiquetaSalida = contadorEtiqueta;
                     if (root.ChildNodes[1].ToString().Equals("ARRIBA"))
                     {
                         //TO
@@ -210,7 +211,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         //DOWN TO
                         traduccion += "if (T" + tmp + " >= T" + contadorTemporal + ") goto L" + etiquetaVerdadera + ";" + Environment.NewLine;
                     }
-                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
+                    traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "//Inicio de instrucciones pertenecientes al bloque FOR" + Environment.NewLine;
                     traduccion += "L" + etiquetaVerdadera + ": //Etiqueta verdadera, se ejecutan las instrucciones" + Environment.NewLine;
                     recorrer(root.ChildNodes[2], entorno);
@@ -221,7 +222,7 @@ namespace Proyecto2_Compiladores2.Analizador
 
                     traduccion += "goto L" + etiquetaInicial + ";" + Environment.NewLine;
                     traduccion += "//Fin de instrucciones pertenecientes al bloque FOR" + Environment.NewLine;
-                    traduccion += "L" + etiquetaFalsa + ": //Salida del FOR" + Environment.NewLine; 
+                    traduccion += "L" + etiquetaSalida + ": //Salida del FOR" + Environment.NewLine; 
                     break;
                 case "LLAMADA":
                     if (root.ChildNodes[0].ToString().Equals("writeln (id)"))
