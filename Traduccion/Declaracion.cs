@@ -29,7 +29,7 @@ namespace Proyecto2_Compiladores2.Traduccion
             else
             {
                 contadorTemporal++;
-                resultadoTraduccion = "T" + contadorTemporal + " = 0";
+                resultadoTraduccion = "T" + contadorTemporal + " = 0;";
             }
             resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";" +
                 Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
