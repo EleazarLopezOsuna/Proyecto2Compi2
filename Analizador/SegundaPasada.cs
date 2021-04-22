@@ -19,11 +19,15 @@ namespace Proyecto2_Compiladores2.Analizador
         private Declaracion declaracion;
         public int contadorTemporal;
         public int contadorEtiqueta;
+        private int temporalSwitch;
+        private int temporalSalidaSwitch;
         public SegundaPasada(int contadorEtiqueta)
         {
             posicionRelativa = 0;
             declaracion = new Declaracion(0);
             contadorTemporal = 0;
+            temporalSwitch = 0;
+            temporalSalidaSwitch = 0;
             this.contadorEtiqueta = contadorEtiqueta;
         }
         public void iniciarSegundaPasada(ParseTreeNode root, int posicionAbsoluta, Entorno entorno)
@@ -50,7 +54,6 @@ namespace Proyecto2_Compiladores2.Analizador
         {
             Simbolo simbolo = null;
             string str;
-            int etiquetaSalidaIf;
             int etiquetaVerdadera;
             int etiquetaFalsa;
             int etiquetaInicial;
@@ -149,23 +152,24 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "L" + etiquetaSalida + ":" + Environment.NewLine;
                     break;
                 case "REPEAT":
-                    // repeat instrucciones until condicion
-                    //              0                 1
+                    // repeat instrucciones instrucciones until condicion
+                    //              0               1               2
                     contadorEtiqueta++;
                     etiquetaInicial = contadorEtiqueta;
                     traduccion += "L" + etiquetaInicial + ": //Etiqueta que permite generar el ciclo" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
                     traduccion += "//Inicio de instrucciones pertenecientes al bloque REPEAT" + Environment.NewLine;
                     recorrer(root.ChildNodes[0], entorno);
+                    recorrer(root.ChildNodes[1], entorno);
                     traduccion += "//Fin de instrucciones pertenecientes al bloque REPEAT" + Environment.NewLine;
                     traduccion += "//Inicio de calculo de la expresion condicional del REPEAT" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+                    str = declaracion.ResolverExpresion(root.ChildNodes[2], entorno) + Environment.NewLine;
                     traduccion += str;
                     traduccion += "//Fin de calculo de la expresion condicional del REPEAT" + Environment.NewLine;
                     if (declaracion.contadorTemporal > contadorTemporal)
                         contadorTemporal = declaracion.contadorTemporal;
-                    traduccion += "if (T" + contadorTemporal + ") goto L" + etiquetaInicial + "; //Movimiento hacia el ciclo REPEAT" + Environment.NewLine;
+                    traduccion += "if (!T" + declaracion.contadorTemporal + ") goto L" + etiquetaInicial + "; //Movimiento hacia el ciclo REPEAT" + Environment.NewLine;
                     contadorEtiqueta++;
                     etiquetaSalida = contadorEtiqueta;
                     traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
@@ -195,8 +199,6 @@ namespace Proyecto2_Compiladores2.Analizador
                     }
                     traduccion += str + Environment.NewLine;
                     traduccion += "//Fin de calculo de la expresion condicional del FOR" + Environment.NewLine;
-                    if (declaracion.contadorTemporal > contadorTemporal)
-                        contadorTemporal = declaracion.contadorTemporal;
                     contadorEtiqueta++;
                     etiquetaVerdadera = contadorEtiqueta;
                     contadorEtiqueta++;
@@ -211,6 +213,8 @@ namespace Proyecto2_Compiladores2.Analizador
                         //DOWN TO
                         traduccion += "if (T" + tmp + " >= T" + contadorTemporal + ") goto L" + etiquetaVerdadera + ";" + Environment.NewLine;
                     }
+                    if (declaracion.contadorTemporal > contadorTemporal)
+                        contadorTemporal = declaracion.contadorTemporal;
                     traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "//Inicio de instrucciones pertenecientes al bloque FOR" + Environment.NewLine;
                     traduccion += "L" + etiquetaVerdadera + ": //Etiqueta verdadera, se ejecutan las instrucciones" + Environment.NewLine;
@@ -224,8 +228,80 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "//Fin de instrucciones pertenecientes al bloque FOR" + Environment.NewLine;
                     traduccion += "L" + etiquetaSalida + ": //Salida del FOR" + Environment.NewLine; 
                     break;
+                case "CASE":
+                    //Case
+                    // expresion case listaCase
+                    //     0       1      2
+                    traduccion += "//Inicio de calculo de la expresion del SWITCH" + Environment.NewLine;
+                    declaracion.contadorTemporal = 0;
+                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno);
+                    //tmp = contadorTemporal;
+                    if (!str.StartsWith("T"))
+                    {
+                        contadorTemporal++;
+                        str = "T" + contadorTemporal + " = " + str;
+                    }
+                    temporalSwitch = contadorTemporal;
+                    contadorTemporal++;
+                    contadorEtiqueta++;
+                    temporalSalidaSwitch = contadorEtiqueta;
+                    traduccion += str + Environment.NewLine;
+                    traduccion += "//Fin de calculo de la expresion del SWITCH" + Environment.NewLine;
+                    recorrer(root.ChildNodes[1], entorno);
+                    recorrer(root.ChildNodes[2], entorno);
+                    if (root.ChildNodes.Count == 4)
+                    {
+                        //Case-else
+                        // expresion case listaCase sentencia(else)
+                        //     0       1      2            3
+                        recorrer(root.ChildNodes[3], entorno);
+                    }
+                    traduccion += "L" + temporalSalidaSwitch + ": //Salida del SWITCH" + Environment.NewLine;
+                    break;
+                case "OPCION_CASE":
+                    if (root.ChildNodes.Count > 0)
+                    {
+                        if (!root.ChildNodes[0].ToString().Equals("OPCION_CASE"))
+                        {
+                            traduccion += "//Inicio de calculo de expresion del CASE" + Environment.NewLine;
+                            declaracion.contadorTemporal = 0;
+                            str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno);
+                            if (declaracion.contadorTemporal > contadorTemporal)
+                                contadorTemporal = declaracion.contadorTemporal;
+                            //tmp = contadorTemporal;
+                            if (!str.StartsWith("T"))
+                            {
+                                contadorTemporal++;
+                                str = "T" + contadorTemporal + " = " + str;
+                            }
+                            traduccion += str + Environment.NewLine;
+                            traduccion += "//Fin de calculo de expresion del CASE" + Environment.NewLine;
+                            contadorEtiqueta++;
+                            etiquetaVerdadera = contadorEtiqueta;
+                            contadorEtiqueta++;
+                            etiquetaSalida = contadorEtiqueta;
+                            contadorEtiqueta++;
+                            etiquetaFalsa = contadorEtiqueta;
+                            traduccion += "if (T" + contadorTemporal + " == T" + temporalSwitch + ") goto L" + etiquetaVerdadera + "; //Entra al case en caso que se cumpla la condicion" + Environment.NewLine;
+                            declaracion.contadorTemporal = 0;
+                            traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a la etiqueta falsa" + Environment.NewLine;
+                            traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
+                            contadorTemporal++;
+                            recorrer(root.ChildNodes[1], entorno);
+                            traduccion += "goto L" + temporalSalidaSwitch + "; //Movimiento a etiqueta de escape del CASE" + Environment.NewLine;
+                            traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
+                            //Codigo para salir del if cuando fue verdadero
+                            traduccion += "L" + etiquetaSalida + ": //Salio del if" + Environment.NewLine;
+                        }
+                        else
+                        {
+                            recorrer(root.ChildNodes[0], entorno);
+                            recorrer(root.ChildNodes[1], entorno);
+                        }
+                    }
+                    break;
                 case "LLAMADA":
-                    if (root.ChildNodes[0].ToString().Equals("writeln (id)"))
+                    if (root.ChildNodes[0].ToString().Contains("writeln (id)"))
                     {
                         traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "%c\", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
                     }

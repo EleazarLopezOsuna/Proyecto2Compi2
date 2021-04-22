@@ -64,7 +64,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                     traduccion += "STACK[" + simbolo.direccionAbsoluta + "];";
                     return traduccion;
                 }
-                else if (root.ChildNodes[0].ToString().Equals("EXPRESION"))
+                else if (root.ChildNodes[0].ToString().Equals("EXPRESION") || root.ToString().Equals("RANGO"))
                 {
                     //Expresion anidada
                     return ResolverExpresion(root.ChildNodes[0], entorno);
