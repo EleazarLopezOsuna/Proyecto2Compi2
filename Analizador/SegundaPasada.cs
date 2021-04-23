@@ -343,6 +343,7 @@ namespace Proyecto2_Compiladores2.Analizador
                             {
                                 //identificador := expresion
                                 //     0               1
+                                declaracion.contadorTemporal = 0;
                                 str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
 
 
