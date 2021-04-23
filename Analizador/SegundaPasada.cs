@@ -36,7 +36,7 @@ namespace Proyecto2_Compiladores2.Analizador
             traduccion = "";
             this.posicionAbsoluta = posicionAbsoluta;
             errores = new ArrayList();
-            recorrer(root, entorno);
+            recorrer(root, entorno, 0, 0);
         }
         private Expresion buscarVariable(ParseTreeNode root, Entorno entorno)
         {
@@ -50,16 +50,16 @@ namespace Proyecto2_Compiladores2.Analizador
                 return new Expresion(resultadoBusqueda.tipo);
             }
         }
-        private void recorrer(ParseTreeNode root, Entorno entorno)
+        private void recorrer(ParseTreeNode root, Entorno entorno, int etiquetaFinCiclo, int etiquetaInicioCiclo)
         {
             Simbolo simbolo = null;
             string str;
             int etiquetaVerdadera;
             int etiquetaFalsa;
-            int etiquetaInicial;
-            int etiquetaSalida;
             int tmp;
             string nombreVariable;
+            int etiquetaInicial;
+            int etiquetaSalida;
             switch (root.ToString())
             {
                 case "PROGRAMA":
@@ -69,7 +69,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     {
                         foreach (ParseTreeNode hijo in root.ChildNodes)
                         {
-                            recorrer(hijo, entorno);
+                            recorrer(hijo, entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                         }
                     }
                     break;
@@ -95,10 +95,10 @@ namespace Proyecto2_Compiladores2.Analizador
                         etiquetaFalsa = contadorEtiqueta;
                         traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
-                        recorrer(root.ChildNodes[1], entorno);
+                        recorrer(root.ChildNodes[1], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                         traduccion += "goto L" + etiquetaSalida + "; //Movimiento a etiqueta de escape del if" + Environment.NewLine;
                         traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
-                        recorrer(root.ChildNodes[2], entorno);
+                        recorrer(root.ChildNodes[2], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                         //Codigo para salir del if cuando fue verdadero
                         traduccion += "L" + etiquetaSalida + ": //Salio del if" + Environment.NewLine;
                     }
@@ -121,7 +121,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         etiquetaSalida = contadorEtiqueta;
                         traduccion += "goto L" + etiquetaSalida + "; //Movimiento a etiqueta falsa" + Environment.NewLine;
                         traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
-                        recorrer(root.ChildNodes[1], entorno);
+                        recorrer(root.ChildNodes[1], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                         //Codigo para salir del if sin importar si fue verdadero o falso
                         traduccion += "L" + etiquetaSalida + ": //Salio del if" + Environment.NewLine;
                     }
@@ -147,7 +147,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    recorrer(root.ChildNodes[1], entorno);
+                    recorrer(root.ChildNodes[1], entorno, etiquetaSalida, etiquetaInicial);
                     traduccion += "goto L" + etiquetaInicial + ";" + Environment.NewLine;
                     traduccion += "L" + etiquetaSalida + ":" + Environment.NewLine;
                     break;
@@ -159,8 +159,10 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "L" + etiquetaInicial + ": //Etiqueta que permite generar el ciclo" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
                     traduccion += "//Inicio de instrucciones pertenecientes al bloque REPEAT" + Environment.NewLine;
-                    recorrer(root.ChildNodes[0], entorno);
-                    recorrer(root.ChildNodes[1], entorno);
+                    contadorEtiqueta++;
+                    etiquetaSalida = contadorEtiqueta;
+                    recorrer(root.ChildNodes[0], entorno, etiquetaSalida, etiquetaInicial);
+                    recorrer(root.ChildNodes[1], entorno, etiquetaSalida, etiquetaInicial);
                     traduccion += "//Fin de instrucciones pertenecientes al bloque REPEAT" + Environment.NewLine;
                     traduccion += "//Inicio de calculo de la expresion condicional del REPEAT" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
@@ -170,8 +172,6 @@ namespace Proyecto2_Compiladores2.Analizador
                     if (declaracion.contadorTemporal > contadorTemporal)
                         contadorTemporal = declaracion.contadorTemporal;
                     traduccion += "if (!T" + declaracion.contadorTemporal + ") goto L" + etiquetaInicial + "; //Movimiento hacia el ciclo REPEAT" + Environment.NewLine;
-                    contadorEtiqueta++;
-                    etiquetaSalida = contadorEtiqueta;
                     traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "L" + etiquetaSalida + ":" + Environment.NewLine;
                     break;
@@ -182,7 +182,9 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "//Inicializacion de variable" + Environment.NewLine;
                     etiquetaInicial = contadorEtiqueta;
                     tmp = contadorTemporal;
-                    recorrer(root.ChildNodes[0], entorno);
+                    contadorEtiqueta++;
+                    etiquetaSalida = contadorEtiqueta;
+                    recorrer(root.ChildNodes[0], entorno, etiquetaSalida, etiquetaInicial);
                     traduccion += "L" + etiquetaInicial + ": //Etiqueta que permite generar el ciclo FOR" + Environment.NewLine;
                     nombreVariable = removerExtras(root.ChildNodes[0].ChildNodes[0].ChildNodes[0].ToString());
                     simbolo = entorno.buscar(removerExtras(nombreVariable));
@@ -201,8 +203,6 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "//Fin de calculo de la expresion condicional del FOR" + Environment.NewLine;
                     contadorEtiqueta++;
                     etiquetaVerdadera = contadorEtiqueta;
-                    contadorEtiqueta++;
-                    etiquetaSalida = contadorEtiqueta;
                     if (root.ChildNodes[1].ToString().Equals("ARRIBA"))
                     {
                         //TO
@@ -218,7 +218,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "goto L" + etiquetaSalida + ";" + Environment.NewLine;
                     traduccion += "//Inicio de instrucciones pertenecientes al bloque FOR" + Environment.NewLine;
                     traduccion += "L" + etiquetaVerdadera + ": //Etiqueta verdadera, se ejecutan las instrucciones" + Environment.NewLine;
-                    recorrer(root.ChildNodes[2], entorno);
+                    recorrer(root.ChildNodes[2], entorno, etiquetaSalida, etiquetaInicial);
 
                     contadorTemporal++;
                     traduccion += "T" + contadorTemporal + " = STACK[" + simbolo.direccionAbsoluta + "] + 1 ;" + Environment.NewLine;
@@ -247,14 +247,14 @@ namespace Proyecto2_Compiladores2.Analizador
                     temporalSalidaSwitch = contadorEtiqueta;
                     traduccion += str + Environment.NewLine;
                     traduccion += "//Fin de calculo de la expresion del SWITCH" + Environment.NewLine;
-                    recorrer(root.ChildNodes[1], entorno);
-                    recorrer(root.ChildNodes[2], entorno);
+                    recorrer(root.ChildNodes[1], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
+                    recorrer(root.ChildNodes[2], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                     if (root.ChildNodes.Count == 4)
                     {
                         //Case-else
                         // expresion case listaCase sentencia(else)
                         //     0       1      2            3
-                        recorrer(root.ChildNodes[3], entorno);
+                        recorrer(root.ChildNodes[3], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                     }
                     traduccion += "L" + temporalSalidaSwitch + ": //Salida del SWITCH" + Environment.NewLine;
                     break;
@@ -287,7 +287,7 @@ namespace Proyecto2_Compiladores2.Analizador
                             traduccion += "goto L" + etiquetaFalsa + "; //Movimiento a la etiqueta falsa" + Environment.NewLine;
                             traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
                             contadorTemporal++;
-                            recorrer(root.ChildNodes[1], entorno);
+                            recorrer(root.ChildNodes[1], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                             traduccion += "goto L" + temporalSalidaSwitch + "; //Movimiento a etiqueta de escape del CASE" + Environment.NewLine;
                             traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
                             //Codigo para salir del if cuando fue verdadero
@@ -295,16 +295,38 @@ namespace Proyecto2_Compiladores2.Analizador
                         }
                         else
                         {
-                            recorrer(root.ChildNodes[0], entorno);
-                            recorrer(root.ChildNodes[1], entorno);
+                            recorrer(root.ChildNodes[0], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
+                            recorrer(root.ChildNodes[1], entorno, etiquetaFinCiclo, etiquetaInicioCiclo);
                         }
                     }
                     break;
                 case "LLAMADA":
                     if (root.ChildNodes[0].ToString().Contains("writeln (id)"))
                     {
-                        traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "%c\", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                        if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE") || root.ChildNodes[0].ChildNodes.Count > 1)
+                        {
+                            declaracion.contadorTemporal = 0;
+                            str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno);
+                            if (!str.StartsWith("T"))
+                            {
+                                contadorTemporal++;
+                                str = "T" + contadorTemporal + " = " + str + Environment.NewLine;
+                                declaracion.contadorTemporal++;
+                            }
+                            traduccion += str;
+                            traduccion += "printf(\"%f%c\",T" + declaracion.contadorTemporal + ", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                        }
+                        else
+                        {
+                            traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "%c\", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                        }
                     }
+                    break;
+                case "BREAK":
+                    traduccion += "goto L" + etiquetaFinCiclo + "; //Salimos del ciclo en el cual estamos" + Environment.NewLine;
+                    break;
+                case "CONTINUE":
+                    traduccion += "goto L" + etiquetaInicioCiclo + "; //Salimos del ciclo en el cual estamos" + Environment.NewLine;
                     break;
                 case "ASIGNACION":
                     if (root.ChildNodes.Count == 2)
