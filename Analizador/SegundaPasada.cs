@@ -313,8 +313,12 @@ namespace Proyecto2_Compiladores2.Analizador
                                 str = "T" + contadorTemporal + " = " + str + Environment.NewLine;
                                 declaracion.contadorTemporal++;
                             }
+                            if (declaracion.contadorTemporal > contadorTemporal)
+                            {
+                                contadorTemporal = declaracion.contadorTemporal;
+                            }
                             traduccion += str;
-                            traduccion += "printf(\"%f%c\",T" + declaracion.contadorTemporal + ", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                            traduccion += "printf(\"%f%c\",T" + contadorTemporal + ", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
                         }
                         else
                         {
