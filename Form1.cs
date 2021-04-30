@@ -71,26 +71,29 @@ namespace Proyecto2_Compiladores2
                         Object[] traduccionVariable;
                         string codigoTresDirecciones = "";
                         string encabezado = "#include <stdio.h>" + Environment.NewLine +
-                            "float HEAP[100000];" + Environment.NewLine +
-                            "float STACK[100000];" + Environment.NewLine +
+                            "float HEAP[100000000];" + Environment.NewLine +
+                            "float STACK[100000000];" + Environment.NewLine +
                             "float SP;" + Environment.NewLine + 
                             "float HP;" + Environment.NewLine +
                             "float ";
                         string cuerpo = "void main(){" + Environment.NewLine;
-                        foreach (KeyValuePair<string, Simbolo> llave in corridaUno.entornoGlobal.tabla)
+                        foreach (Entorno entorno in corridaUno.entornos)
                         {
-                            tipo = "Variable";
-                            variable = llave.Value;
-                            if (variable.constante)
-                                tipo = "Constante";
-                            symbol_table.Rows.Add(llave.Key, variable.tipo, "Global", tipo, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
-                            traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal, llave.Key);
-                            if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
+                            foreach (KeyValuePair<string, Simbolo> llave in entorno.tabla)
                             {
-                                contadorTemporal = int.Parse(traduccionVariable[0].ToString());
+                                tipo = "Variable";
+                                variable = llave.Value;
+                                if (variable.constante)
+                                    tipo = "Constante";
+                                symbol_table.Rows.Add(llave.Key, variable.tipo, entorno.nombreEntorno, tipo, variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                                traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal, llave.Key);
+                                if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
+                                {
+                                    contadorTemporal = int.Parse(traduccionVariable[0].ToString());
+                                }
+                                tradurcirDeclaracion.contadorTemporal = 0;
+                                cuerpo += traduccionVariable[1] + Environment.NewLine;
                             }
-                            tradurcirDeclaracion.contadorTemporal = 0;
-                            cuerpo += traduccionVariable[1] + Environment.NewLine;
                         }
                         SegundaPasada segundaPasada = new SegundaPasada(contadorEtiqueta);
                         segundaPasada.iniciarSegundaPasada(resultadoAnalisis.Root, 0, corridaUno.entornoGlobal);

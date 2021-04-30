@@ -21,14 +21,16 @@ namespace Proyecto2_Compiladores2.Analizador
         public int contadorEtiqueta;
         private int temporalSwitch;
         private int temporalSalidaSwitch;
+        private int SP, HP;
         public SegundaPasada(int contadorEtiqueta)
         {
             posicionRelativa = 0;
             declaracion = new Declaracion(0);
-            contadorTemporal = 0;
+            contadorTemporal = 1;
             temporalSwitch = 0;
             temporalSalidaSwitch = 0;
             this.contadorEtiqueta = contadorEtiqueta;
+            SP = HP = 0;
         }
         public void iniciarSegundaPasada(ParseTreeNode root, int posicionAbsoluta, Entorno entorno)
         {
@@ -181,6 +183,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     contadorEtiqueta++;
                     traduccion += "//Inicializacion de variable" + Environment.NewLine;
                     etiquetaInicial = contadorEtiqueta;
+                    contadorTemporal++;
                     tmp = contadorTemporal;
                     contadorEtiqueta++;
                     etiquetaSalida = contadorEtiqueta;
@@ -303,7 +306,7 @@ namespace Proyecto2_Compiladores2.Analizador
                 case "LLAMADA":
                     if (root.ChildNodes[0].ToString().Contains("writeln (id)"))
                     {
-                        if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE") || root.ChildNodes[0].ChildNodes.Count > 1)
+                        if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE") || root.ChildNodes[1].ChildNodes.Count > 1)
                         {
                             declaracion.contadorTemporal = 0;
                             str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno);
@@ -318,12 +321,44 @@ namespace Proyecto2_Compiladores2.Analizador
                                 contadorTemporal = declaracion.contadorTemporal;
                             }
                             traduccion += str;
-                            traduccion += "printf(\"%f%c\",T" + contadorTemporal + ", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                            traduccion += "printf(\"%f\",T" + contadorTemporal + ");" + Environment.NewLine; //Eliminar luego, es solo para control
                         }
                         else
                         {
-                            traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "%c\", 10);" + Environment.NewLine; //Eliminar luego, es solo para control
+                            traduccion += "printf(\"" + removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + "\");" + Environment.NewLine; //Eliminar luego, es solo para control
                         }
+                        ParseTreeNode nodoTemporal = root.ChildNodes[2];
+                        while (nodoTemporal.ChildNodes.Count > 0)
+                        {
+                            if (nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("VARIABLE") || nodoTemporal.ChildNodes[0].ChildNodes.Count > 1 || nodoTemporal.ChildNodes[0].ChildNodes[0].ChildNodes.Count > 1)
+                            {
+                                declaracion.contadorTemporal = 0;
+                                str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno);
+                                if (!str.StartsWith("T"))
+                                {
+                                    contadorTemporal++;
+                                    str = "T" + contadorTemporal + " = " + str + Environment.NewLine;
+                                    declaracion.contadorTemporal++;
+                                }
+                                if (declaracion.contadorTemporal > contadorTemporal)
+                                {
+                                    contadorTemporal = declaracion.contadorTemporal;
+                                }
+                                traduccion += str;
+                                traduccion += "printf(\"%f\",T" + contadorTemporal + ");" + Environment.NewLine; //Eliminar luego, es solo para control
+                            }
+                            else
+                            {
+                                str = removerExtras(nodoTemporal.ChildNodes[0].ChildNodes[0].ToString());
+                                if (str.Equals(""))
+                                {
+                                    str = " ";
+                                }
+                                traduccion += "printf(\"" + str + "\");" + Environment.NewLine; //Eliminar luego, es solo para control
+                            }
+                            nodoTemporal = nodoTemporal.ChildNodes[1];
+                        }
+                        traduccion += "printf(\"%c\", 10);" + Environment.NewLine;
                     }
                     break;
                 case "BREAK":

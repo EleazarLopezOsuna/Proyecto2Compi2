@@ -49,6 +49,7 @@ namespace Proyecto2_Compiladores2
             this.Tipo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Ambito = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Rol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Size = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Absoluta = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Relativa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fila = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -187,6 +188,7 @@ namespace Proyecto2_Compiladores2
             this.Tipo,
             this.Ambito,
             this.Rol,
+            this.Size,
             this.Absoluta,
             this.Relativa,
             this.Fila,
@@ -255,19 +257,26 @@ namespace Proyecto2_Compiladores2
             this.Rol.ReadOnly = true;
             this.Rol.Width = 105;
             // 
+            // Size
+            // 
+            this.Size.HeaderText = "S";
+            this.Size.Name = "Size";
+            this.Size.ReadOnly = true;
+            this.Size.Width = 40;
+            // 
             // Absoluta
             // 
             this.Absoluta.HeaderText = "A";
             this.Absoluta.Name = "Absoluta";
             this.Absoluta.ReadOnly = true;
-            this.Absoluta.Width = 50;
+            this.Absoluta.Width = 40;
             // 
             // Relativa
             // 
             this.Relativa.HeaderText = "R";
             this.Relativa.Name = "Relativa";
             this.Relativa.ReadOnly = true;
-            this.Relativa.Width = 50;
+            this.Relativa.Width = 40;
             // 
             // Fila
             // 
@@ -275,7 +284,7 @@ namespace Proyecto2_Compiladores2
             this.Fila.Name = "Fila";
             this.Fila.ReadOnly = true;
             this.Fila.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Fila.Width = 50;
+            this.Fila.Width = 40;
             // 
             // Columna
             // 
@@ -283,7 +292,7 @@ namespace Proyecto2_Compiladores2
             this.Columna.Name = "Columna";
             this.Columna.ReadOnly = true;
             this.Columna.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Columna.Width = 50;
+            this.Columna.Width = 40;
             // 
             // Form1
             // 
@@ -332,6 +341,7 @@ namespace Proyecto2_Compiladores2
         private System.Windows.Forms.DataGridViewTextBoxColumn Tipo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Ambito;
         private System.Windows.Forms.DataGridViewTextBoxColumn Rol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Size;
         private System.Windows.Forms.DataGridViewTextBoxColumn Absoluta;
         private System.Windows.Forms.DataGridViewTextBoxColumn Relativa;
         private System.Windows.Forms.DataGridViewTextBoxColumn Fila;
