@@ -18,22 +18,24 @@ namespace Proyecto2_Compiladores2.Modelos
         public Simbolo contenido;
         public ParseTreeNode root;
         public Entorno atributos;
+        public int direccionHeap;
 
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root)
         {
             this.tipo = tipo;
-            this.constante = false;
+            constante = false;
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
             this.columna = columna;
             this.root = root;
             size = 1;
+            direccionHeap = -1;
         }
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Simbolo contenido)
         {
             this.tipo = tipo;
-            this.constante = false;
+            constante = false;
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
@@ -41,11 +43,12 @@ namespace Proyecto2_Compiladores2.Modelos
             this.root = root;
             this.size = size;
             this.contenido = contenido;
+            direccionHeap = -1;
         }
-        public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Entorno atributos)
+        public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Entorno atributos, int direccionHeap)
         {
             this.tipo = tipo;
-            this.constante = false;
+            constante = false;
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
@@ -53,6 +56,7 @@ namespace Proyecto2_Compiladores2.Modelos
             this.root = root;
             this.size = size;
             this.atributos = atributos;
+            this.direccionHeap = direccionHeap;
         }
         public enum EnumTipo
         {

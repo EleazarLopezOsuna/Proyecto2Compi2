@@ -49,6 +49,7 @@ namespace Proyecto2_Compiladores2
             this.Tipo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Ambito = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Rol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Heap = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Size = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Absoluta = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Relativa = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -188,6 +189,7 @@ namespace Proyecto2_Compiladores2
             this.Tipo,
             this.Ambito,
             this.Rol,
+            this.Heap,
             this.Size,
             this.Absoluta,
             this.Relativa,
@@ -201,6 +203,7 @@ namespace Proyecto2_Compiladores2
             this.symbol_table.Size = new System.Drawing.Size(760, 242);
             this.symbol_table.TabIndex = 15;
             this.symbol_table.Visible = false;
+            this.symbol_table.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.symbol_table_CellContentClick);
             // 
             // label2
             // 
@@ -232,7 +235,7 @@ namespace Proyecto2_Compiladores2
             this.Nombre.Name = "Nombre";
             this.Nombre.ReadOnly = true;
             this.Nombre.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Nombre.Width = 153;
+            this.Nombre.Width = 143;
             // 
             // Tipo
             // 
@@ -240,7 +243,6 @@ namespace Proyecto2_Compiladores2
             this.Tipo.Name = "Tipo";
             this.Tipo.ReadOnly = true;
             this.Tipo.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Tipo.Width = 110;
             // 
             // Ambito
             // 
@@ -248,14 +250,21 @@ namespace Proyecto2_Compiladores2
             this.Ambito.Name = "Ambito";
             this.Ambito.ReadOnly = true;
             this.Ambito.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Ambito.Width = 150;
+            this.Ambito.Width = 140;
             // 
             // Rol
             // 
             this.Rol.HeaderText = "Rol";
             this.Rol.Name = "Rol";
             this.Rol.ReadOnly = true;
-            this.Rol.Width = 105;
+            this.Rol.Width = 95;
+            // 
+            // Heap
+            // 
+            this.Heap.HeaderText = "H";
+            this.Heap.Name = "Heap";
+            this.Heap.ReadOnly = true;
+            this.Heap.Width = 40;
             // 
             // Size
             // 
@@ -341,6 +350,7 @@ namespace Proyecto2_Compiladores2
         private System.Windows.Forms.DataGridViewTextBoxColumn Tipo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Ambito;
         private System.Windows.Forms.DataGridViewTextBoxColumn Rol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Heap;
         private System.Windows.Forms.DataGridViewTextBoxColumn Size;
         private System.Windows.Forms.DataGridViewTextBoxColumn Absoluta;
         private System.Windows.Forms.DataGridViewTextBoxColumn Relativa;

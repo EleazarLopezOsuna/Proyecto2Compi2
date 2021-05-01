@@ -18,6 +18,7 @@ namespace Proyecto2_Compiladores2
         private int posicionAbsoluta;
         private int contadorTemporal;
         private int contadorEtiqueta;
+        private string cuerpo;
 
         public Form1()
         {
@@ -69,32 +70,14 @@ namespace Proyecto2_Compiladores2
                         Simbolo variable;
                         string tipo;
                         Object[] traduccionVariable;
-                        string codigoTresDirecciones = "";
                         string encabezado = "#include <stdio.h>" + Environment.NewLine +
                             "float HEAP[100000000];" + Environment.NewLine +
                             "float STACK[100000000];" + Environment.NewLine +
                             "float SP;" + Environment.NewLine + 
                             "float HP;" + Environment.NewLine +
                             "float ";
-                        string cuerpo = "void main(){" + Environment.NewLine;
-                        foreach (Entorno entorno in corridaUno.entornos)
-                        {
-                            foreach (KeyValuePair<string, Simbolo> llave in entorno.tabla)
-                            {
-                                tipo = "Variable";
-                                variable = llave.Value;
-                                if (variable.constante)
-                                    tipo = "Constante";
-                                symbol_table.Rows.Add(llave.Key, variable.tipo, entorno.nombreEntorno, tipo, variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
-                                traduccionVariable = tradurcirDeclaracion.Traducir(variable, corridaUno.entornoGlobal, llave.Key);
-                                if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
-                                {
-                                    contadorTemporal = int.Parse(traduccionVariable[0].ToString());
-                                }
-                                tradurcirDeclaracion.contadorTemporal = 0;
-                                cuerpo += traduccionVariable[1] + Environment.NewLine;
-                            }
-                        }
+                        cuerpo = "void main(){" + Environment.NewLine;
+                        traducirVariables(corridaUno.entornoGlobal, tradurcirDeclaracion);
                         SegundaPasada segundaPasada = new SegundaPasada(contadorEtiqueta);
                         segundaPasada.iniciarSegundaPasada(resultadoAnalisis.Root, 0, corridaUno.entornoGlobal);
                         if (segundaPasada.contadorTemporal > contadorTemporal)
@@ -149,6 +132,44 @@ namespace Proyecto2_Compiladores2
             {
 
             }
+        }
+
+        private void traducirVariables(Entorno ent, Declaracion tradurcirDeclaracion)
+        {
+            Simbolo variable;
+            Object[] traduccionVariable;
+            string tipo;
+            foreach (KeyValuePair<string, Simbolo> llave in ent.tabla)
+            {
+                tipo = "Variable";
+                variable = llave.Value;
+                if (variable.constante)
+                    tipo = "Constante";
+                if (variable.direccionHeap == -1)
+                {
+                    symbol_table.Rows.Add(llave.Key, variable.tipo, ent.nombreEntorno, tipo, "NA", variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                }
+                else
+                {
+                    symbol_table.Rows.Add(llave.Key, variable.tipo, ent.nombreEntorno, tipo, variable.direccionHeap, variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                }
+                traduccionVariable = tradurcirDeclaracion.Traducir(variable, ent, llave.Key);
+                if (contadorTemporal < int.Parse(traduccionVariable[0].ToString()))
+                {
+                    contadorTemporal = int.Parse(traduccionVariable[0].ToString());
+                }
+                tradurcirDeclaracion.contadorTemporal = 0;
+                cuerpo += traduccionVariable[1] + Environment.NewLine;
+                if (variable.tipo == Simbolo.EnumTipo.objeto)
+                {
+                    traducirVariables(variable.atributos, tradurcirDeclaracion);
+                }
+            }
+        }
+
+        private void symbol_table_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }
