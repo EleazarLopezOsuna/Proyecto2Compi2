@@ -432,11 +432,15 @@ namespace Proyecto2_Compiladores2.Analizador
                             //Es un arreglo
                             nodoTemp = root.ChildNodes[2];
                             int numero1, numero2;
+                            ArrayList inferiores = new ArrayList();
+                            ArrayList superiores = new ArrayList();
                             while (nodoTemp.ChildNodes.Count > 0)
                             {
                                 hijoTemp = nodoTemp.ChildNodes[contador];
                                 numero1 = int.Parse(removerExtras(hijoTemp.ChildNodes[0].ChildNodes[0].ToString()));
                                 numero2 = int.Parse(removerExtras(hijoTemp.ChildNodes[1].ChildNodes[0].ToString()));
+                                inferiores.Add(numero1);
+                                superiores.Add(numero2);
                                 size *= (numero2 - numero1 + 1);
                                 if (contador == 1)
                                 {
@@ -481,6 +485,8 @@ namespace Proyecto2_Compiladores2.Analizador
                             else
                             {
                                 simbolo.constante = false;
+                                simbolo.limiteInferior = inferiores;
+                                simbolo.limiteSuperior = superiores;
                                 if (simbolo.tipo != Simbolo.EnumTipo.error)
                                 {
                                     if (!entorno.insertar(removerExtras(root.ChildNodes[0].ToString()), new Simbolo(Simbolo.EnumTipo.arreglo, posicionAbsoluta, posicionRelativa, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Line, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Column, null, size * simbolo.size, simbolo)))
@@ -494,6 +500,10 @@ namespace Proyecto2_Compiladores2.Analizador
                                         posicionRelativa++;
                                     }
                                 }
+                            }
+                            for(int h = 0; h < inferiores.Count; h++)
+                            {
+                                MessageBox.Show("Limite inferior para la dimension " + h + ": " + inferiores[h] + "\nLimite superior para la dimension " + h + ": " + superiores[h]);
                             }
                             recorrer(root.ChildNodes[4], entorno);
                         }
