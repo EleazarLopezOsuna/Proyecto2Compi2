@@ -63,13 +63,10 @@ namespace Proyecto2_Compiladores2
                 {
                     PrimeraPasada corridaUno = new PrimeraPasada();
                     corridaUno.iniciarPrimeraPasada(resultadoAnalisis.Root, posicionAbsoluta);
-                    Declaracion tradurcirDeclaracion = new Declaracion(contadorTemporal);
+                    Declaracion tradurcirDeclaracion = new Declaracion(contadorTemporal, contadorEtiqueta);
                     if (corridaUno.errores.Count == 0)
                     {
                         //No existieron errores al momento de crear las variables
-                        Simbolo variable;
-                        string tipo;
-                        Object[] traduccionVariable;
                         string encabezado = "#include <stdio.h>" + Environment.NewLine +
                             "float HEAP[100000000];" + Environment.NewLine +
                             "float STACK[100000000];" + Environment.NewLine +
@@ -158,11 +155,47 @@ namespace Proyecto2_Compiladores2
                 {
                     contadorTemporal = int.Parse(traduccionVariable[0].ToString());
                 }
+                if (contadorEtiqueta < int.Parse(traduccionVariable[2].ToString()))
+                {
+                    contadorEtiqueta = int.Parse(traduccionVariable[2].ToString());
+                }
                 tradurcirDeclaracion.contadorTemporal = 0;
-                cuerpo += traduccionVariable[1] + Environment.NewLine;
+                if (traduccionVariable[1].ToString() != "")
+                {
+                    cuerpo += traduccionVariable[1] + Environment.NewLine;
+                }
                 if (variable.tipo == Simbolo.EnumTipo.objeto)
                 {
-                    traducirVariables(variable.atributos, tradurcirDeclaracion);
+                    foreach (KeyValuePair<string, Simbolo> t in variable.atributos.tabla)
+                    {
+                        MessageBox.Show(llave.Key + " parametro: " + t.Key);
+                    }
+                    soloAgregar(variable.atributos, tradurcirDeclaracion);
+                }
+            }
+        }
+
+        private void soloAgregar(Entorno ent, Declaracion tradurcirDeclaracion)
+        {
+            Simbolo variable;
+            string tipo;
+            foreach (KeyValuePair<string, Simbolo> llave in ent.tabla)
+            {
+                tipo = "Variable";
+                variable = llave.Value;
+                if (variable.constante)
+                    tipo = "Constante";
+                if (variable.direccionHeap == -1)
+                {
+                    symbol_table.Rows.Add(llave.Key, variable.tipo, ent.nombreEntorno, tipo, "NA", variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                }
+                else
+                {
+                    symbol_table.Rows.Add(llave.Key, variable.tipo, ent.nombreEntorno, tipo, variable.direccionHeap, variable.size, variable.direccionAbsoluta, variable.direccionRelativa, variable.fila + 1, variable.columna + 1);
+                }
+                if (variable.tipo == Simbolo.EnumTipo.objeto)
+                {
+                    soloAgregar(variable.atributos, tradurcirDeclaracion);
                 }
             }
         }

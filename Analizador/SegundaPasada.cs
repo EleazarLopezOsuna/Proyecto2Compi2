@@ -25,7 +25,7 @@ namespace Proyecto2_Compiladores2.Analizador
         public SegundaPasada(int contadorEtiqueta)
         {
             posicionRelativa = 0;
-            declaracion = new Declaracion(0);
+            declaracion = new Declaracion(0, contadorEtiqueta);
             contadorTemporal = 1;
             temporalSwitch = 0;
             temporalSalidaSwitch = 0;

@@ -9,32 +9,69 @@ namespace Proyecto2_Compiladores2.Traduccion
     class Declaracion
     {
         public int contadorTemporal;
-        public Declaracion(int contadorTemporal) {
+        public int contadorEtiqueta;
+        public Declaracion(int contadorTemporal, int contadorEtiqueta) {
             this.contadorTemporal = contadorTemporal;
+            this.contadorEtiqueta = contadorEtiqueta;
         }
         public Object[] Traducir(Simbolo variable, Entorno entorno, string nombreVariable)
         {
-            Object[] retorno = new Object[2];
+            Object[] retorno = new Object[3];
             string resultadoTraduccion = "";
-            if (variable.root != null)
+            if (variable.tipo == Simbolo.EnumTipo.arreglo)
             {
-                resultadoTraduccion += ResolverExpresion(variable.root, entorno);
-                if (!resultadoTraduccion.StartsWith("T"))
+                if (variable.direccionHeap != -1)
                 {
-                    contadorTemporal++;
-                    resultadoTraduccion = "//Inicio de declaracion de identificador " + nombreVariable + Environment.NewLine +
-                        "T" + contadorTemporal + " = " + resultadoTraduccion;
+                    contadorEtiqueta++;
+                    resultadoTraduccion += "L" + contadorEtiqueta + ": //Nos permite marcar el inicio del for que nos permite poner valores iniciales (0 | -36.3636) al arreglo" + Environment.NewLine;
+                    int direccionHeap = variable.direccionHeap;
+                    int size = variable.size;
+                    string dato = "0";
+                    if (variable.contenido.tipo == Simbolo.EnumTipo.cadena)
+                    {
+                        dato = "-36.3636";
+                    }
+                    for (int i = direccionHeap; i < size + direccionHeap; i++)
+                    {
+                        resultadoTraduccion += "HEAP[" + i + "] = " + dato + "; //Asignacion del dato" + Environment.NewLine;
+                    }
+                    resultadoTraduccion += "";
                 }
+            }
+            else if(variable.tipo == Simbolo.EnumTipo.objeto)
+            {
+                if (variable.direccionHeap != -1)
+                {
+
+                }
+            }
+            else if (variable.tipo == Simbolo.EnumTipo.cadena)
+            {
+                
             }
             else
             {
-                contadorTemporal++;
-                resultadoTraduccion = "T" + contadorTemporal + " = 0;";
+                if (variable.root != null)
+                {
+                    resultadoTraduccion += ResolverExpresion(variable.root, entorno);
+                    if (!resultadoTraduccion.StartsWith("T"))
+                    {
+                        contadorTemporal++;
+                        resultadoTraduccion = "//Inicio de declaracion de identificador " + nombreVariable + Environment.NewLine +
+                            "T" + contadorTemporal + " = " + resultadoTraduccion;
+                    }
+                }
+                else
+                {
+                    contadorTemporal++;
+                    resultadoTraduccion = "T" + contadorTemporal + " = 0;";
+                }
+                resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";" +
+                    Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
             }
-            resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";" +
-                Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
             retorno[0] = contadorTemporal;
             retorno[1] = resultadoTraduccion;
+            retorno[2] = contadorEtiqueta;
             return retorno;
         }
 

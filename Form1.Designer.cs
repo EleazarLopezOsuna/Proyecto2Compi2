@@ -50,7 +50,7 @@ namespace Proyecto2_Compiladores2
             this.Ambito = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Rol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Heap = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Size = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Sizex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Absoluta = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Relativa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fila = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -190,7 +190,7 @@ namespace Proyecto2_Compiladores2
             this.Ambito,
             this.Rol,
             this.Heap,
-            this.Size,
+            this.Sizex,
             this.Absoluta,
             this.Relativa,
             this.Fila,
@@ -266,12 +266,12 @@ namespace Proyecto2_Compiladores2
             this.Heap.ReadOnly = true;
             this.Heap.Width = 40;
             // 
-            // Size
+            // Sizex
             // 
-            this.Size.HeaderText = "S";
-            this.Size.Name = "Size";
-            this.Size.ReadOnly = true;
-            this.Size.Width = 40;
+            this.Sizex.HeaderText = "S";
+            this.Sizex.Name = "Sizex";
+            this.Sizex.ReadOnly = true;
+            this.Sizex.Width = 40;
             // 
             // Absoluta
             // 
@@ -351,7 +351,7 @@ namespace Proyecto2_Compiladores2
         private System.Windows.Forms.DataGridViewTextBoxColumn Ambito;
         private System.Windows.Forms.DataGridViewTextBoxColumn Rol;
         private System.Windows.Forms.DataGridViewTextBoxColumn Heap;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Size;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Sizex;
         private System.Windows.Forms.DataGridViewTextBoxColumn Absoluta;
         private System.Windows.Forms.DataGridViewTextBoxColumn Relativa;
         private System.Windows.Forms.DataGridViewTextBoxColumn Fila;
