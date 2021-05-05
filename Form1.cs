@@ -166,10 +166,6 @@ namespace Proyecto2_Compiladores2
                 }
                 if (variable.tipo == Simbolo.EnumTipo.objeto)
                 {
-                    foreach (KeyValuePair<string, Simbolo> t in variable.atributos.tabla)
-                    {
-                        MessageBox.Show(llave.Key + " parametro: " + t.Key);
-                    }
                     soloAgregar(variable.atributos, tradurcirDeclaracion);
                 }
             }

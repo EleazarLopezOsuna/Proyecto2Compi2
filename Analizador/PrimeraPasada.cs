@@ -94,9 +94,9 @@ namespace Proyecto2_Compiladores2.Analizador
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
                                     simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
-                                    simbolo.size = 64;
+                                    simbolo.size = 4;
                                     simbolo.direccionHeap = posicionHeap;
-                                    posicionHeap += 64;
+                                    posicionHeap += 4;
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -150,9 +150,9 @@ namespace Proyecto2_Compiladores2.Analizador
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("string"))
                                 {
                                     simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
-                                    simbolo.size = 64;
+                                    simbolo.size = 4;
                                     simbolo.direccionHeap = posicionHeap;
-                                    posicionHeap += 64;
+                                    posicionHeap += 4;
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -242,9 +242,9 @@ namespace Proyecto2_Compiladores2.Analizador
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
                                     simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
-                                    simbolo.size = 64;
+                                    simbolo.size = 4;
                                     simbolo.direccionHeap = posicionHeap;
-                                    posicionHeap += 64;
+                                    posicionHeap += 4;
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -266,17 +266,17 @@ namespace Proyecto2_Compiladores2.Analizador
                                             {
                                                 if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
                                                 {
-                                                    posicionHeap++;
-                                                    Simbolo sTmp = new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, posicionHeap + 1);
-                                                    Dictionary<string, Simbolo> dicTemp2 = new Dictionary<string, Simbolo>();
+                                                    //posicionHeap++;
+                                                    //Simbolo sTmp = new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, posicionHeap + 1);
+                                                    //Dictionary<string, Simbolo> dicTemp2 = new Dictionary<string, Simbolo>();
                                                     foreach (KeyValuePair<string, Simbolo> pareja in pair.Value.atributos.tabla)
                                                     {
-                                                        posicionHeap++;
-                                                        dicTemp2.Add(pair.Key + "_" + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, dicTemp2.Count, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
+                                                        //posicionHeap++;
+                                                        dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, dicTemp.Count, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
                                                         posicionHeap += pareja.Value.size;
                                                     }
-                                                    sTmp.atributos.tabla = dicTemp2;
-                                                    dicTemp.Add(pair.Key, sTmp);
+                                                    //sTmp.atributos.tabla = dicTemp2;
+                                                    //dicTemp.Add(pair.Key, sTmp);
                                                 }
                                                 else
                                                 {
@@ -292,8 +292,11 @@ namespace Proyecto2_Compiladores2.Analizador
                                         }
                                         else
                                         {
-                                            simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, tmpSim.contenido);
-                                            simbolo.direccionHeap = posicionHeap;
+                                            simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, tmpSim.contenido)
+                                            {
+                                                direccionHeap = posicionHeap
+                                            };
+                                            MessageBox.Show(simbolo.direccionHeap + "");
                                             posicionHeap += simbolo.size;
                                         }
                                     }
@@ -349,9 +352,9 @@ namespace Proyecto2_Compiladores2.Analizador
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("string"))
                                 {
                                     simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[3]);
-                                    simbolo.size = 64;
+                                    simbolo.size = 4;
                                     simbolo.direccionHeap = posicionHeap;
-                                    posicionHeap += 64;
+                                    posicionHeap += 4;
                                 }
                                 else if (root.ChildNodes[1].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -405,9 +408,9 @@ namespace Proyecto2_Compiladores2.Analizador
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("string"))
                                 {
                                     simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, root.ChildNodes[2]);
-                                    simbolo.size = 64;
+                                    simbolo.size = 4;
                                     simbolo.direccionHeap = posicionHeap;
-                                    posicionHeap += 64;
+                                    posicionHeap += 4;
                                 }
                                 else if (root.ChildNodes[2].ChildNodes[0].ToString().Contains("id"))
                                 {
@@ -489,7 +492,7 @@ namespace Proyecto2_Compiladores2.Analizador
                             else if (root.ChildNodes[2].ChildNodes[3].ChildNodes[0].ToString().Contains("string"))
                             {
                                 simbolo = new Simbolo(Simbolo.EnumTipo.cadena, -1, -1, 0, 0, null);
-                                simbolo.size = 64;
+                                simbolo.size = 4;
                             }
                             else if (root.ChildNodes[2].ChildNodes[3].ChildNodes[0].ToString().Contains("id"))
                             {
@@ -500,7 +503,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     errores.Add(error);
                                 }
                                 else
-                                {
+                                { 
                                     simbolo = tmp;
                                 }
                             }
@@ -568,7 +571,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         else if (hijoTemp.ChildNodes[2].ToString().Contains("string"))
                                         {
                                             simbolo = new Simbolo(Simbolo.EnumTipo.cadena, -1, -1, 0, 0, null);
-                                            simbolo.size = 64;
+                                            simbolo.size = 4;
                                         }
                                         else if (hijoTemp.ChildNodes[2].ToString().Contains("id"))
                                         {
@@ -622,8 +625,8 @@ namespace Proyecto2_Compiladores2.Analizador
                                                 }
                                                 else
                                                 {
-                                                    //size += simbolo.size;
-                                                    size++;
+                                                    size += simbolo.size;
+                                                    //size++;
                                                 }
                                             }
                                         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using Irony.Parsing;
 using Proyecto2_Compiladores2.Modelos;
 
@@ -10,6 +11,7 @@ namespace Proyecto2_Compiladores2.Traduccion
     {
         public int contadorTemporal;
         public int contadorEtiqueta;
+        private Declaracion declaracionTemp;
         public Declaracion(int contadorTemporal, int contadorEtiqueta) {
             this.contadorTemporal = contadorTemporal;
             this.contadorEtiqueta = contadorEtiqueta;
@@ -18,22 +20,144 @@ namespace Proyecto2_Compiladores2.Traduccion
         {
             Object[] retorno = new Object[3];
             string resultadoTraduccion = "";
+            int verdadero;
+            int falso;
             if (variable.tipo == Simbolo.EnumTipo.arreglo)
             {
                 if (variable.direccionHeap != -1)
                 {
                     contadorEtiqueta++;
-                    resultadoTraduccion += "L" + contadorEtiqueta + ": //Nos permite marcar el inicio del for que nos permite poner valores iniciales (0 | -36.3636) al arreglo" + Environment.NewLine;
                     int direccionHeap = variable.direccionHeap;
                     int size = variable.size;
                     string dato = "0";
-                    if (variable.contenido.tipo == Simbolo.EnumTipo.cadena)
+                    if (variable.contenido.tipo == Simbolo.EnumTipo.arreglo)
                     {
-                        dato = "-36.3636";
+                        int tmpSize = variable.size;
+                        int posicion = variable.direccionHeap;
+                        dato = "0";
+                        contadorTemporal++;
+                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                        resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        verdadero = contadorEtiqueta;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        falso = contadorEtiqueta;
+                        resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                        resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                        resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                        contadorTemporal++;
+                        contadorEtiqueta++;
+                        posicion += tmpSize;
                     }
-                    for (int i = direccionHeap; i < size + direccionHeap; i++)
+                    else if (variable.contenido.tipo == Simbolo.EnumTipo.objeto)
                     {
-                        resultadoTraduccion += "HEAP[" + i + "] = " + dato + "; //Asignacion del dato" + Environment.NewLine;
+                        int tmpDireccionHeap;
+                        int tmpSize;
+                        int posicion = variable.direccionHeap;
+                        for (int i = 0; i < (variable.size / variable.contenido.size); i ++)
+                        {
+                            foreach (KeyValuePair<string, Simbolo> pair in variable.contenido.atributos.tabla)
+                            {
+                                tmpSize = pair.Value.size;
+                                //MessageBox.Show("Nombre: " + pair.Key + Environment.NewLine + "Direccion Aboluta: " + pair.Value.direccionAbsoluta
+                                //    + Environment.NewLine + "Posicion Heap: " + pair.Value.direccionHeap + Environment.NewLine + "Size: " + pair.Value.size
+                                //    + Environment.NewLine + "Posicion Relativa: " + pair.Value.direccionRelativa);
+                                dato = "0";
+                                if (pair.Value.tipo == Simbolo.EnumTipo.arreglo)
+                                {
+                                    declaracionTemp = new Declaracion(0, contadorEtiqueta);
+                                    Object[] tmp = declaracionTemp.Traducir(pair.Value, entorno, nombreVariable);
+                                    if (contadorTemporal < int.Parse(tmp[0].ToString()))
+                                    {
+                                        contadorTemporal = int.Parse(tmp[0].ToString());
+                                    }
+                                    resultadoTraduccion += tmp[1];
+                                    contadorEtiqueta = int.Parse(tmp[2].ToString());
+                                }
+                                else if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
+                                {
+                                    foreach (KeyValuePair<string, Simbolo> pareja in pair.Value.atributos.tabla)
+                                    {
+                                        tmpSize = pareja.Value.size;
+                                        dato = "0";
+                                        tmpDireccionHeap = pareja.Value.direccionAbsoluta;
+                                        if (pareja.Value.tipo == Simbolo.EnumTipo.cadena)
+                                        {
+                                            dato = "-36.3636";
+                                        }
+                                        contadorTemporal++;
+                                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                                        resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                                        contadorEtiqueta++;
+                                        verdadero = contadorEtiqueta;
+                                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                        contadorEtiqueta++;
+                                        falso = contadorEtiqueta;
+                                        resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                        resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                                        resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                                        resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                                        resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                                        resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                                        contadorTemporal++;
+                                        contadorEtiqueta++;
+                                        posicion += tmpSize;
+                                    }
+                                }
+                                else
+                                {
+                                    tmpDireccionHeap = pair.Value.direccionAbsoluta;
+                                    if (pair.Value.tipo == Simbolo.EnumTipo.cadena)
+                                    {
+                                        dato = "-36.3636";
+                                    }
+                                    contadorTemporal++;
+                                    resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                                    resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                                    contadorEtiqueta++;
+                                    verdadero = contadorEtiqueta;
+                                    resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                    contadorEtiqueta++;
+                                    falso = contadorEtiqueta;
+                                    resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                    resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                                    resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                                    resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                                    resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                                    resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                                    contadorTemporal++;
+                                    contadorEtiqueta++;
+                                    posicion += tmpSize;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (variable.contenido.tipo == Simbolo.EnumTipo.cadena)
+                        {
+                            dato = "-36.3636";
+                        }
+                        contadorTemporal++;
+                        resultadoTraduccion += "T" + contadorTemporal + " = " + direccionHeap + "; //Iniciacion del for" + Environment.NewLine;
+                        resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        verdadero = contadorEtiqueta;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (size + direccionHeap) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        falso = contadorEtiqueta;
+                        resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                        resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                        resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                        contadorTemporal++;
+                        contadorEtiqueta++;
                     }
                     resultadoTraduccion += "";
                 }
@@ -42,7 +166,36 @@ namespace Proyecto2_Compiladores2.Traduccion
             {
                 if (variable.direccionHeap != -1)
                 {
-
+                    int tmpDireccionHeap;
+                    int tmpSize;
+                    int posicion = variable.direccionHeap;
+                    string dato = "";
+                    foreach (KeyValuePair<string, Simbolo> pareja in variable.atributos.tabla)
+                    {
+                        tmpSize = pareja.Value.size;
+                        dato = "0";
+                        if (pareja.Value.tipo == Simbolo.EnumTipo.cadena)
+                        {
+                            dato = "-36.3636";
+                        }
+                        contadorTemporal++;
+                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                        resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        verdadero = contadorEtiqueta;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        contadorEtiqueta++;
+                        falso = contadorEtiqueta;
+                        resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                        resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                        resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                        resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                        contadorTemporal++;
+                        contadorEtiqueta++;
+                        posicion += tmpSize;
+                    }
                 }
             }
             else if (variable.tipo == Simbolo.EnumTipo.cadena)
