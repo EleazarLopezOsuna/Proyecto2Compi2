@@ -332,20 +332,66 @@ namespace Proyecto2_Compiladores2.Analizador
                         {
                             if (nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("VARIABLE") || nodoTemporal.ChildNodes[0].ChildNodes.Count > 1 || nodoTemporal.ChildNodes[0].ChildNodes[0].ChildNodes.Count > 1)
                             {
-                                declaracion.contadorTemporal = 0;
-                                str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno);
-                                if (!str.StartsWith("T"))
+                                Simbolo sim = null;
+                                if (nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("VARIABLE"))
+                                {
+                                    sim = entorno.buscar(removerExtras(nodoTemporal.ChildNodes[0].ChildNodes[0].ChildNodes[0].ToString()));
+                                    if (sim.tipo != Simbolo.EnumTipo.cadena)
+                                        sim = null;
+                                }
+                                if (sim is null)
+                                {
+                                    declaracion.contadorTemporal = 0;
+                                    str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno);
+                                    if (!str.StartsWith("T"))
+                                    {
+                                        contadorTemporal++;
+                                        str = "T" + contadorTemporal + " = " + str + Environment.NewLine;
+                                        declaracion.contadorTemporal++;
+                                    }
+                                    if (declaracion.contadorTemporal > contadorTemporal)
+                                    {
+                                        contadorTemporal = declaracion.contadorTemporal;
+                                    }
+                                    traduccion += str;
+                                    traduccion += "printf(\"%f\",T" + contadorTemporal + ");" + Environment.NewLine; //Eliminar luego, es solo para control
+                                }
+                                else
                                 {
                                     contadorTemporal++;
-                                    str = "T" + contadorTemporal + " = " + str + Environment.NewLine;
-                                    declaracion.contadorTemporal++;
+                                    //for (int i = 0; i < (sim.direccionHeap + sim.size); i++)
+                                    //{
+                                    //    traduccion += "T" + contadorTemporal + " = HEAP[" + i + "];" + Environment.NewLine;
+                                    //    traduccion += "printf(\"%c\", (int)T" + contadorTemporal + ");" + Environment.NewLine;
+                                    //}
+                                    traduccion += "T" + contadorTemporal + " = " + sim.direccionHeap + ";" + Environment.NewLine;
+                                    int tempTemo = contadorTemporal;
+                                    contadorTemporal++;
+                                    contadorEtiqueta++;
+                                    etiquetaInicial = contadorEtiqueta;
+                                    traduccion += "L" + etiquetaInicial + ":" + Environment.NewLine;
+                                    contadorEtiqueta++;
+                                    etiquetaVerdadera = contadorEtiqueta;
+                                    contadorEtiqueta++;
+                                    etiquetaFalsa = contadorEtiqueta;
+                                    contadorEtiqueta++;
+                                    traduccion += "if (T" + tempTemo + " < " + (sim.direccionHeap + sim.size) + ") goto L" + etiquetaVerdadera + ";" + Environment.NewLine;
+                                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
+                                    traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
+                                    traduccion += "T" + contadorTemporal + " = " + "HEAP[(int)T" + tempTemo + "];" + Environment.NewLine;
+                                    int tempSt = contadorTemporal;
+                                    contadorTemporal++;
+                                    traduccion += "if (T" + tempSt + " != -201700893) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                    int tmpEt = contadorEtiqueta;
+                                    contadorEtiqueta++;
+                                    traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
+                                    traduccion += "L" + tmpEt + ":" + Environment.NewLine;
+                                    //traduccion += "HEAP[(int)T" + tempTemo + "] = T" + tempSt + ";" + Environment.NewLine;
+                                    traduccion += "printf(\"%c\", (int)T" + tempSt + ");" + Environment.NewLine;
+                                    traduccion += "T" + tempTemo + " = T" + tempTemo + " + 1;" + Environment.NewLine;
+                                    traduccion += "goto L" + etiquetaInicial + ";" + Environment.NewLine;
+                                    traduccion += "L" + etiquetaFalsa + ":" + Environment.NewLine;
                                 }
-                                if (declaracion.contadorTemporal > contadorTemporal)
-                                {
-                                    contadorTemporal = declaracion.contadorTemporal;
-                                }
-                                traduccion += str;
-                                traduccion += "printf(\"%f\",T" + contadorTemporal + ");" + Environment.NewLine; //Eliminar luego, es solo para control
                             }
                             else
                             {
@@ -382,38 +428,58 @@ namespace Proyecto2_Compiladores2.Analizador
                             {
                                 //identificador := expresion
                                 //     0               1
-                                declaracion.contadorTemporal = 0;
-                                str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
-
-
-
-                                if (declaracion.contadorTemporal > contadorTemporal)
-                                    contadorTemporal = declaracion.contadorTemporal;
-
-
-                                if (!str.StartsWith("T"))
+                                if (!root.ChildNodes[1].ChildNodes[0].ToString().Contains("cadena"))
                                 {
-                                    contadorTemporal++;
-                                    str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine +
-                                        "T" + contadorTemporal + " = " + str;
+                                    declaracion.contadorTemporal = 0;
+                                    str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+
+
+
+                                    if (declaracion.contadorTemporal > contadorTemporal)
+                                        contadorTemporal = declaracion.contadorTemporal;
+
+
+                                    if (!str.StartsWith("T"))
+                                    {
+                                        contadorTemporal++;
+                                        str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine +
+                                            "T" + contadorTemporal + " = " + str;
+                                    }
+                                    else
+                                    {
+                                        str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine + str;
+                                    }
+                                    traduccion += str;
+                                    if (declaracion.contadorTemporal > contadorTemporal)
+                                    {
+                                        contadorTemporal = declaracion.contadorTemporal;
+                                        traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                    }
+                                    else
+                                    {
+                                        if (declaracion.contadorTemporal == 0)
+                                            declaracion.contadorTemporal = contadorTemporal;
+                                        traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                    }
+                                    declaracion.contadorTemporal = 0;
                                 }
                                 else
                                 {
-                                    str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine + str;
+                                    if (simbolo.tipo == Simbolo.EnumTipo.cadena)
+                                    {
+                                        string contenido = removerExtras(root.ChildNodes[1].ChildNodes[0].ToString());
+                                        for (int i = 0; i < contenido.Length; i++)
+                                        {
+                                            if (i == 63)
+                                                break;
+                                            traduccion += "HEAP[" + (simbolo.direccionHeap + i) + "] = " + Convert.ToInt32(contenido[i]) + "; //Letra: " + contenido[i] + Environment.NewLine;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //Error de tipos
+                                    }
                                 }
-                                traduccion += str;
-                                if (declaracion.contadorTemporal > contadorTemporal)
-                                {
-                                    contadorTemporal = declaracion.contadorTemporal;
-                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    if (declaracion.contadorTemporal == 0)
-                                        declaracion.contadorTemporal = contadorTemporal;
-                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
-                                }
-                                declaracion.contadorTemporal = 0;
                             }
                         }
                     }

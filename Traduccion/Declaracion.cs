@@ -87,7 +87,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                                         tmpDireccionHeap = pareja.Value.direccionAbsoluta;
                                         if (pareja.Value.tipo == Simbolo.EnumTipo.cadena)
                                         {
-                                            dato = "-36.3636";
+                                            dato = "-201700893";
                                         }
                                         contadorTemporal++;
                                         resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
@@ -113,7 +113,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                                     tmpDireccionHeap = pair.Value.direccionAbsoluta;
                                     if (pair.Value.tipo == Simbolo.EnumTipo.cadena)
                                     {
-                                        dato = "-36.3636";
+                                        dato = "-201700893";
                                     }
                                     contadorTemporal++;
                                     resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
@@ -140,7 +140,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                     {
                         if (variable.contenido.tipo == Simbolo.EnumTipo.cadena)
                         {
-                            dato = "-36.3636";
+                            dato = "-201700893";
                         }
                         contadorTemporal++;
                         resultadoTraduccion += "T" + contadorTemporal + " = " + direccionHeap + "; //Iniciacion del for" + Environment.NewLine;
@@ -176,7 +176,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                         dato = "0";
                         if (pareja.Value.tipo == Simbolo.EnumTipo.cadena)
                         {
-                            dato = "-36.3636";
+                            dato = "-201700893";
                         }
                         contadorTemporal++;
                         resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
@@ -200,7 +200,27 @@ namespace Proyecto2_Compiladores2.Traduccion
             }
             else if (variable.tipo == Simbolo.EnumTipo.cadena)
             {
-                
+                int tmpSize;
+                tmpSize = variable.size;
+                int posicion = variable.direccionHeap;
+                string dato = "-201700893";
+                contadorTemporal++;
+                resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
+                contadorEtiqueta++;
+                verdadero = contadorEtiqueta;
+                resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                contadorEtiqueta++;
+                falso = contadorEtiqueta;
+                resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                resultadoTraduccion += "L" + verdadero + ": //Llenamos el arreglo" + Environment.NewLine;
+                resultadoTraduccion += "HEAP[(int)T" + contadorTemporal + "] = " + dato + ";" + Environment.NewLine;
+                resultadoTraduccion += "T" + contadorTemporal + " = T" + contadorTemporal + " + 1; //Incremento del for" + Environment.NewLine;
+                resultadoTraduccion += "goto L" + (verdadero - 1) + ";" + Environment.NewLine;
+                resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
+                contadorTemporal++;
+                contadorEtiqueta++;
+                posicion += tmpSize;
             }
             else
             {
