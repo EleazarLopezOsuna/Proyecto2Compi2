@@ -35,14 +35,27 @@ namespace Proyecto2_Compiladores2.Traduccion
                     if (variable.contenido.tipo == Simbolo.EnumTipo.arreglo)
                     {
                         int tmpSize = variable.size;
+
                         int posicion = variable.direccionHeap;
+
                         dato = "0";
                         contadorTemporal++;
-                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                        int posicionAnterior = contadorTemporal;
+                        contadorTemporal++;
+                        resultadoTraduccion += "HP = " + posicion + ";//Actualizacion de HP" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP; //Iniciacion del for" + Environment.NewLine;
+                        //////resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                        
                         resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                         contadorEtiqueta++;
                         verdadero = contadorEtiqueta;
-                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                        resultadoTraduccion += "T_HP = HP + " + tmpSize + ";" + Environment.NewLine;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        
                         contadorEtiqueta++;
                         falso = contadorEtiqueta;
                         resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -53,26 +66,41 @@ namespace Proyecto2_Compiladores2.Traduccion
                         resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
                         contadorTemporal++;
                         contadorEtiqueta++;
-                        posicion += tmpSize;
+                        resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
                     }
                     else if (variable.contenido.tipo == Simbolo.EnumTipo.objeto)
                     {
                         int tmpDireccionHeap;
                         int tmpSize;
+
                         int posicion = variable.direccionHeap;
+
                         for (int i = 0; i < (variable.size / variable.contenido.size); i ++)
                         {
                             foreach (KeyValuePair<string, Simbolo> pair in variable.contenido.atributos.tabla)
                             {
                                 tmpSize = pair.Value.size;
-                                //MessageBox.Show("Nombre: " + pair.Key + Environment.NewLine + "Direccion Aboluta: " + pair.Value.direccionAbsoluta
-                                //    + Environment.NewLine + "Posicion Heap: " + pair.Value.direccionHeap + Environment.NewLine + "Size: " + pair.Value.size
-                                //    + Environment.NewLine + "Posicion Relativa: " + pair.Value.direccionRelativa);
                                 dato = "0";
                                 if (pair.Value.tipo == Simbolo.EnumTipo.arreglo)
                                 {
                                     declaracionTemp = new Declaracion(0, contadorEtiqueta);
+
+
+                                    int tmpHP, tmpSP;
+
+                                    if (variable.direccionHeap == -1)
+                                    {
+                                        tmpHP = -1;
+                                        tmpSP = variable.direccionRelativa;
+                                    }
+                                    else
+                                    {
+                                        tmpSP = -1;
+                                        tmpHP = variable.direccionHeap;
+                                    }
+
                                     Object[] tmp = declaracionTemp.Traducir(pair.Value, entorno, nombreVariable);
+                                    
                                     if (contadorTemporal < int.Parse(tmp[0].ToString()))
                                     {
                                         contadorTemporal = int.Parse(tmp[0].ToString());
@@ -92,11 +120,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                                             dato = "-201700893";
                                         }
                                         contadorTemporal++;
-                                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
+                                        resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                                        int posicionAnterior = contadorTemporal;
+                                        contadorTemporal++;
+                                        resultadoTraduccion += "HP = " + posicion + ";//Actualizacion de HP" + Environment.NewLine;
+                                        resultadoTraduccion += "T" + contadorTemporal + " = HP; //Iniciacion del for" + Environment.NewLine;
+                                        //////resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                                        
                                         resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                                         contadorEtiqueta++;
                                         verdadero = contadorEtiqueta;
-                                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                                        resultadoTraduccion += "T_HP = HP + " + tmpSize + ";" + Environment.NewLine;
+                                        resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                        //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                        
                                         contadorEtiqueta++;
                                         falso = contadorEtiqueta;
                                         resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -108,6 +147,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                                         contadorTemporal++;
                                         contadorEtiqueta++;
                                         posicion += tmpSize;
+                                        resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
                                     }
                                 }
                                 else
@@ -118,11 +158,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                                         dato = "-201700893";
                                     }
                                     contadorTemporal++;
-                                    resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
+                                    resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                                    int posicionAnterior = contadorTemporal;
+                                    contadorTemporal++;
+                                    resultadoTraduccion += "HP = " + posicion + ";//Actualizacion de HP" + Environment.NewLine;
+                                    resultadoTraduccion += "T" + contadorTemporal + " = HP; //Iniciacion del for" + Environment.NewLine;
+                                    //////resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                                    
                                     resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                                     contadorEtiqueta++;
                                     verdadero = contadorEtiqueta;
-                                    resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                                    resultadoTraduccion += "T_HP = HP + " + tmpSize + ";" + Environment.NewLine;
+                                    resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                    //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                                    
                                     contadorEtiqueta++;
                                     falso = contadorEtiqueta;
                                     resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -134,6 +185,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                                     contadorTemporal++;
                                     contadorEtiqueta++;
                                     posicion += tmpSize;
+                                    resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
                                 }
                             }
                         }
@@ -145,11 +197,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                             dato = "-201700893";
                         }
                         contadorTemporal++;
-                        resultadoTraduccion += "T" + contadorTemporal + " = " + direccionHeap + "; //Iniciacion del for" + Environment.NewLine;
+
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                        int posicionAnterior = contadorTemporal;
+                        contadorTemporal++;
+                        resultadoTraduccion += "HP = " + direccionHeap + ";//Actualizacion de HP" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP; //Iniciacion del for" + Environment.NewLine;
+                        //////resultadoTraduccion += "T" + contadorTemporal + " = " + direccionHeap + "; //Iniciacion del for" + Environment.NewLine;
+                        
                         resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                         contadorEtiqueta++;
                         verdadero = contadorEtiqueta;
-                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (size + direccionHeap) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                        resultadoTraduccion += "T_HP = HP + " + size + ";" + Environment.NewLine;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (size + direccionHeap) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        
                         contadorEtiqueta++;
                         falso = contadorEtiqueta;
                         resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -160,6 +223,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                         resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
                         contadorTemporal++;
                         contadorEtiqueta++;
+                        resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
                     }
                     resultadoTraduccion += "";
                 }
@@ -168,9 +232,10 @@ namespace Proyecto2_Compiladores2.Traduccion
             {
                 if (variable.direccionHeap != -1)
                 {
-                    int tmpDireccionHeap;
                     int tmpSize;
+
                     int posicion = variable.direccionHeap;
+
                     string dato = "";
                     foreach (KeyValuePair<string, Simbolo> pareja in variable.atributos.tabla)
                     {
@@ -181,11 +246,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                             dato = "-201700893";
                         }
                         contadorTemporal++;
-                        resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                        int posicionAnterior = contadorTemporal;
+                        contadorTemporal++;
+                        resultadoTraduccion += "HP = " + posicion + ";//Actualizacion de HP" + Environment.NewLine;
+                        resultadoTraduccion += "T" + contadorTemporal + " = HP; //Iniciacion del for" + Environment.NewLine;
+                        //////resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+                        
                         resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                         contadorEtiqueta++;
                         verdadero = contadorEtiqueta;
-                        resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                        resultadoTraduccion += "T_HP = HP + " + tmpSize + ";" + Environment.NewLine;
+                        resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                        //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
                         contadorEtiqueta++;
                         falso = contadorEtiqueta;
                         resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -196,7 +272,7 @@ namespace Proyecto2_Compiladores2.Traduccion
                         resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
                         contadorTemporal++;
                         contadorEtiqueta++;
-                        posicion += tmpSize;
+                        resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
                     }
                 }
             }
@@ -207,11 +283,22 @@ namespace Proyecto2_Compiladores2.Traduccion
                 int posicion = variable.direccionHeap;
                 string dato = "-201700893";
                 contadorTemporal++;
-                resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
+                resultadoTraduccion += "T" + contadorTemporal + " = HP;//Guardamos la posicion de HP anterior" + Environment.NewLine;
+                int posicionAnterior = contadorTemporal;
+                contadorTemporal++;
+                resultadoTraduccion += "HP = " + variable.direccionHeap + ";//Actualizacion de HP" + Environment.NewLine;
+                resultadoTraduccion += "T" + contadorTemporal + " = HP ; //Iniciacion del for" + Environment.NewLine;
+                //////resultadoTraduccion += "T" + contadorTemporal + " = " + posicion + "; //Iniciacion del for" + Environment.NewLine;
+
                 resultadoTraduccion += "L" + contadorEtiqueta + ": //Etiqueta para generar el loop" + Environment.NewLine;
                 contadorEtiqueta++;
                 verdadero = contadorEtiqueta;
-                resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
+                resultadoTraduccion += "T_HP = HP + " + tmpSize + ";" + Environment.NewLine;
+                resultadoTraduccion += "if (T" + contadorTemporal + " < T_HP) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+                //////resultadoTraduccion += "if (T" + contadorTemporal + " < " + (tmpSize + posicion) + ") goto L" + contadorEtiqueta + ";" + Environment.NewLine;
+
                 contadorEtiqueta++;
                 falso = contadorEtiqueta;
                 resultadoTraduccion += "goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -222,14 +309,14 @@ namespace Proyecto2_Compiladores2.Traduccion
                 resultadoTraduccion += "L" + falso + ":" + Environment.NewLine;
                 contadorTemporal++;
                 contadorEtiqueta++;
-                posicion += tmpSize;
+                resultadoTraduccion += "HP = T" + posicionAnterior + ";//Regresamos la posicion de HP" + Environment.NewLine;
             }
             else
             {
                 if (variable.root != null)
                 {
-                    resultadoTraduccion += ResolverExpresion(variable.root, entorno);
-                    if (!resultadoTraduccion.StartsWith("T"))
+                    resultadoTraduccion = ResolverExpresionAsignacion(variable.root, entorno);
+                    if (!(resultadoTraduccion is null) && !resultadoTraduccion.StartsWith("T"))
                     {
                         contadorTemporal++;
                         resultadoTraduccion = "//Inicio de declaracion de identificador " + nombreVariable + Environment.NewLine +
@@ -241,15 +328,24 @@ namespace Proyecto2_Compiladores2.Traduccion
                     contadorTemporal++;
                     resultadoTraduccion = "T" + contadorTemporal + " = 0;";
                 }
-                resultadoTraduccion += Environment.NewLine + "STACK[" + variable.direccionAbsoluta + "] = T" + contadorTemporal + ";" +
-                    Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
+                if (!(resultadoTraduccion is null))
+                {
+                    resultadoTraduccion += Environment.NewLine + "T_SP = SP + " + variable.direccionRelativa + ";";
+                    resultadoTraduccion += Environment.NewLine + "STACK[(int)T_SP] = T" + contadorTemporal + ";" +
+                        Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
+                }
+                else
+                {
+                    resultadoTraduccion += Environment.NewLine + "T_SP = SP + " + variable.direccionRelativa + ";" + Environment.NewLine;
+                    resultadoTraduccion += "//Inicio de declaracion de identificador " + nombreVariable + Environment.NewLine + "STACK[(int)T_SP] = 0;" +
+                        Environment.NewLine + "//Fin de declaracion de identificador " + nombreVariable;
+                }
             }
             retorno[0] = contadorTemporal;
             retorno[1] = resultadoTraduccion;
             retorno[2] = contadorEtiqueta;
             return retorno;
         }
-
         private string removerExtras(string token)
         {
             token = token.Replace(" (id)", "");
@@ -428,6 +524,93 @@ namespace Proyecto2_Compiladores2.Traduccion
                     retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
             }
             return retorno;
+        }
+        public string ResolverExpresionAsignacion(ParseTreeNode root, Entorno entorno)
+        {
+            string traduccion = "";
+            if (root.ChildNodes.Count == 1)
+            {
+                //Es un solo termino
+                if (root.ChildNodes[0].ToString().Equals("VARIABLE"))
+                {
+                    //Reportar error, no se puede asignar una variable a otra variable dentro de la misma declaracion
+                    // var numero1 : integer = 1;
+                    // var numero2 : integer = numero2;  <- aca esta el error
+                    return null;
+                }
+                else if (root.ChildNodes[0].ToString().Equals("EXPRESION") || root.ToString().Equals("RANGO"))
+                {
+                    //Expresion anidada
+                    return ResolverExpresionAsignacion(root.ChildNodes[0], entorno);
+                }
+                else if (root.ChildNodes[0].ToString().Equals("ESTRUCTURA"))
+                {
+                    //Reportar error, no se puede asignar una variable a otra variable dentro de la misma declaracion
+                    // var numero1 : integer = 1;
+                    // var numero2 : integer = numero2;  <- aca esta el error
+                    return null;
+                }
+                else
+                {
+                    //Es un valor puntual, no debemos de buscar nada
+                    string res = removerExtras(root.ChildNodes[0].ToString()) + ";";
+                    if ((root.ChildNodes[0].ToString()).Contains("(boleano)"))
+                    {
+                        if (root.ChildNodes[0].ToString().Contains("false"))
+                            res = "0;";
+                        else
+                            res = "1;";
+                    }
+                    return res;
+                }
+            }
+            else if (root.ChildNodes.Count == 3)
+            {
+                //Es una operacion binaria OPERADOR1 (+, -, * , /, %, AND, OR, >, <, >=, <=, <>, =) OPERADOR2
+                string operador1 = ResolverExpresionAsignacion(root.ChildNodes[0], entorno);
+                if (!operador1.StartsWith("T"))
+                {
+                    contadorTemporal++;
+                    operador1 = "T" + contadorTemporal + " = " + operador1;
+                }
+                int temporalOperador1 = contadorTemporal;
+                string operador2 = ResolverExpresionAsignacion(root.ChildNodes[2], entorno);
+                if (!operador2.StartsWith("T"))
+                {
+                    contadorTemporal++;
+                    operador2 = "T" + contadorTemporal + " = " + operador2;
+                }
+                int temporalOperador2 = contadorTemporal;
+                traduccion += operador1 + Environment.NewLine + operador2;
+                contadorTemporal++;
+                string operador = removerExtras(root.ChildNodes[1].ToString());
+                if (operador.Equals("<>"))
+                    operador = "!=";
+                if (operador.Equals("="))
+                    operador = "==";
+                if (operador.ToLower().Equals("or"))
+                    operador = "||";
+                if (operador.ToLower().Equals("and"))
+                    operador = "&&";
+                traduccion += Environment.NewLine + "T" + contadorTemporal + " = T" + temporalOperador1 + " "
+                        + operador + " T" + temporalOperador2 + ";";
+            }
+            else if (root.ChildNodes.Count == 2)
+            {
+                //Es una operacion unaria (NOT, -)OPERADOR1
+                string operador1 = ResolverExpresionAsignacion(root.ChildNodes[1], entorno);
+                if (!operador1.StartsWith("T"))
+                {
+                    contadorTemporal++;
+                    operador1 = "T" + contadorTemporal + " = " + operador1;
+                }
+                contadorTemporal++;
+                string operador = removerExtras(root.ChildNodes[0].ToString());
+                if (operador.ToLower().Equals("not"))
+                    operador = "!";
+                traduccion += "T" + contadorTemporal + " = " + operador + "T" + (contadorTemporal - 1);
+            }
+            return traduccion;
         }
     }
 }

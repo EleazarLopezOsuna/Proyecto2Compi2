@@ -70,8 +70,9 @@ namespace Proyecto2_Compiladores2
                         string encabezado = "#include <stdio.h>" + Environment.NewLine +
                             "float HEAP[100000000];" + Environment.NewLine +
                             "float STACK[100000000];" + Environment.NewLine +
-                            "float SP;" + Environment.NewLine + 
+                            "float SP;" + Environment.NewLine +
                             "float HP;" + Environment.NewLine +
+                            "float T_SP, T_HP, S_SP, S_HP;" + Environment.NewLine +
                             "float ";
                         cuerpo = "void main(){" + Environment.NewLine;
                         traducirVariables(corridaUno.entornoGlobal, tradurcirDeclaracion);
@@ -136,6 +137,7 @@ namespace Proyecto2_Compiladores2
             Simbolo variable;
             Object[] traduccionVariable;
             string tipo;
+            cuerpo += "SP = 0;" + Environment.NewLine;
             foreach (KeyValuePair<string, Simbolo> llave in ent.tabla)
             {
                 tipo = "Variable";

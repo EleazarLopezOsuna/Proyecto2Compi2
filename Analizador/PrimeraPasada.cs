@@ -266,31 +266,23 @@ namespace Proyecto2_Compiladores2.Analizador
                                             {
                                                 if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
                                                 {
-                                                    //posicionHeap++;
-                                                    //Simbolo sTmp = new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, posicionHeap + 1);
-                                                    //Dictionary<string, Simbolo> dicTemp2 = new Dictionary<string, Simbolo>();
                                                     foreach (KeyValuePair<string, Simbolo> pareja in pair.Value.atributos.tabla)
                                                     {
-                                                        //posicionHeap++;
-                                                        dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, dicTemp.Count, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
+                                                        dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, contadory, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
                                                         posicionHeap += pareja.Value.size;
                                                         contadory += pareja.Value.size;
                                                     }
-                                                    //sTmp.atributos.tabla = dicTemp2;
-                                                    //dicTemp.Add(pair.Key, sTmp);
                                                 }
                                                 else
                                                 {
-                                                    //posicionHeap++;
-                                                    dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, dicTemp.Count, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
+                                                    dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
                                                     posicionHeap += pair.Value.size;
-                                                    contadory += pair.Value.size + 1;
+                                                    contadory += pair.Value.size;
                                                 }
                                             }
                                             Entorno entornoTemp = new Entorno(tmpSim.atributos.anterior, tmpSim.atributos.nombreEntorno);
                                             entornoTemp.tabla = dicTemp;
                                             simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, contadory, entornoTemp, indiceTemp);
-                                            //simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, entornoTemp, indiceTemp);
                                         }
                                         else
                                         {
