@@ -12,9 +12,11 @@ namespace Proyecto2_Compiladores2.Traduccion
         public int contadorTemporal;
         public int contadorEtiqueta;
         private Declaracion declaracionTemp;
+        private string acumulado;
         public Declaracion(int contadorTemporal, int contadorEtiqueta) {
             this.contadorTemporal = contadorTemporal;
             this.contadorEtiqueta = contadorEtiqueta;
+            acumulado = "";
         }
         public Object[] Traducir(Simbolo variable, Entorno entorno, string nombreVariable)
         {
@@ -279,6 +281,15 @@ namespace Proyecto2_Compiladores2.Traduccion
                     //Expresion anidada
                     return ResolverExpresion(root.ChildNodes[0], entorno);
                 }
+                else if (root.ChildNodes[0].ToString().Equals("ESTRUCTURA"))
+                {
+                    int[] datos = obtenerDatosEstructura(root.ChildNodes[0], entorno);
+                    if (!(datos is null))
+                    {
+                        traduccion += "HEAP[" + datos[0] + "];";
+                        return traduccion;
+                    }
+                }
                 else
                 {
                     //Es un valor puntual, no debemos de buscar nada
@@ -340,6 +351,83 @@ namespace Proyecto2_Compiladores2.Traduccion
                 traduccion += "T" + contadorTemporal + " = "  + operador + "T" + (contadorTemporal - 1);
             }
             return traduccion;
+        }
+        private int[] obtenerDatosEstructura(ParseTreeNode root, Entorno entorno)
+        {
+            //Recibimos un nodo tipo ESTRUCTURA
+            int[] retorno = new int[3];
+            string nombreVariable = acumulado + removerExtras(root.ChildNodes[0].ToString()); //Nombre de la variable a buscar
+            Simbolo variable = entorno.buscar(nombreVariable);
+            if (variable is null)
+            {
+                int sizTemp = -1;
+                int posTemp = -1;
+                foreach (KeyValuePair<string, Simbolo> pair in entorno.tabla)
+                {
+                    if (pair.Key.Contains(nombreVariable))
+                    {
+                        if (sizTemp == -1)
+                        {
+                            sizTemp = pair.Value.size;
+                            posTemp += pair.Value.direccionAbsoluta + 1;
+                        }
+                        else
+                        {
+                            sizTemp += pair.Value.size;
+                        }
+                        MessageBox.Show("Variable: " + pair.Key + Environment.NewLine + "Posicion absoluta: " + posTemp + Environment.NewLine + "Size: " + sizTemp);
+                    }
+                }
+                retorno[0] = posTemp; //Posicion inicial
+                retorno[1] = sizTemp; //Size
+                retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                if (posTemp != -1)
+                    return retorno;
+                return null;
+            }
+            if (variable.tipo == Simbolo.EnumTipo.arreglo && root.ChildNodes.Count == 4)
+            {
+                //Es un arreglo y ESTRUCTURA representa a un arreglo
+                int limiteInferior, limiteSuperior;
+                limiteInferior = int.Parse(variable.limiteInferior[0].ToString());
+                limiteSuperior = int.Parse(variable.limiteSuperior[0].ToString());
+
+            }
+            else if (variable.tipo == Simbolo.EnumTipo.objeto && root.ChildNodes.Count == 2)
+            {
+                //Es un objeto y ESTRUCTURA representa a un objeto
+                if (root.ChildNodes[1].ChildNodes.Count > 0)
+                {
+                    if (root.ChildNodes[1].ChildNodes[1].ChildNodes.Count > 0)
+                    {
+                        acumulado = removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + ".";
+                        return obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[1], variable.atributos);
+                    }
+                    return obtenerDatosEstructura(root.ChildNodes[1], variable.atributos);
+                }
+                retorno[0] = variable.direccionAbsoluta; //Posicion inicial
+                retorno[1] = variable.size; //Size
+                retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+            }
+            else
+            {
+                if (root.ChildNodes[1].ChildNodes.Count > 0)
+                    return null;
+                if (acumulado != "")
+                {
+                    //MessageBox.Show("Posicion absoluta: " + variable.direccionAbsoluta + Environment.NewLine + "Size: " + variable.size);
+                }
+                if (variable.direccionHeap == -1)
+                    retorno[0] = variable.direccionAbsoluta; //Posicion inicial
+                else
+                    retorno[0] = variable.direccionHeap;
+                retorno[1] = variable.size; //Size
+                if (variable.tipo == Simbolo.EnumTipo.cadena)
+                    retorno[2] = 1; //Es cadena 0 -> no | 1 -> si
+                else
+                    retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+            }
+            return retorno;
         }
     }
 }

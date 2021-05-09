@@ -21,6 +21,7 @@ namespace Proyecto2_Compiladores2.Modelos
         public int direccionHeap;
         public ArrayList limiteInferior;
         public ArrayList limiteSuperior;
+        public int tipoParametro; // 0 -> no aplica | 1 -> por valor | 2 -> por referencia
 
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root)
         {
@@ -35,6 +36,7 @@ namespace Proyecto2_Compiladores2.Modelos
             direccionHeap = -1;
             limiteInferior = new ArrayList();
             limiteSuperior = new ArrayList();
+            tipoParametro = 0;
         }
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Simbolo contenido)
         {
@@ -50,6 +52,7 @@ namespace Proyecto2_Compiladores2.Modelos
             direccionHeap = -1;
             limiteInferior = new ArrayList();
             limiteSuperior = new ArrayList();
+            tipoParametro = 0;
         }
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Entorno atributos, int direccionHeap)
         {
@@ -65,6 +68,7 @@ namespace Proyecto2_Compiladores2.Modelos
             this.direccionHeap = direccionHeap;
             limiteInferior = new ArrayList();
             limiteSuperior = new ArrayList();
+            tipoParametro = 0;
         }
         public enum EnumTipo
         {

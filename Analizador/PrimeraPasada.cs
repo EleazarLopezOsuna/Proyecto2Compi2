@@ -260,7 +260,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         if (tmp.tipo == Simbolo.EnumTipo.objeto)
                                         {
                                             Dictionary<string, Simbolo> dicTemp = new Dictionary<string, Simbolo>();
-                                            int indiceTemp = posicionHeap + 1;
+                                            int indiceTemp = posicionHeap;
                                             int contadory = 0;
                                             foreach (KeyValuePair<string, Simbolo> pair in tmpSim.atributos.tabla)
                                             {
@@ -274,29 +274,32 @@ namespace Proyecto2_Compiladores2.Analizador
                                                         //posicionHeap++;
                                                         dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, dicTemp.Count, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
                                                         posicionHeap += pareja.Value.size;
+                                                        contadory += pareja.Value.size;
                                                     }
                                                     //sTmp.atributos.tabla = dicTemp2;
                                                     //dicTemp.Add(pair.Key, sTmp);
                                                 }
                                                 else
                                                 {
-                                                    posicionHeap++;
+                                                    //posicionHeap++;
                                                     dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, dicTemp.Count, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
                                                     posicionHeap += pair.Value.size;
+                                                    contadory += pair.Value.size + 1;
                                                 }
-                                                contadory++;
                                             }
                                             Entorno entornoTemp = new Entorno(tmpSim.atributos.anterior, tmpSim.atributos.nombreEntorno);
                                             entornoTemp.tabla = dicTemp;
-                                            simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, entornoTemp, indiceTemp);
+                                            simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, contadory, entornoTemp, indiceTemp);
+                                            //simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, entornoTemp, indiceTemp);
                                         }
                                         else
                                         {
                                             simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, tmpSim.contenido)
                                             {
-                                                direccionHeap = posicionHeap
+                                                direccionHeap = posicionHeap,
+                                                limiteInferior = tmpSim.limiteInferior,
+                                                limiteSuperior = tmpSim.limiteSuperior
                                             };
-                                            MessageBox.Show(simbolo.direccionHeap + "");
                                             posicionHeap += simbolo.size;
                                         }
                                     }
@@ -510,12 +513,15 @@ namespace Proyecto2_Compiladores2.Analizador
                             if (simbolo is null) { }
                             else
                             {
-                                simbolo.constante = false;
-                                simbolo.limiteInferior = inferiores;
-                                simbolo.limiteSuperior = superiores;
+                                Simbolo stmp = new Simbolo(Simbolo.EnumTipo.arreglo, -1, -1, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Line, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Column, null, size * simbolo.size, simbolo)
+                                {
+                                    constante = false,
+                                    limiteInferior = inferiores,
+                                    limiteSuperior = superiores
+                                };
                                 if (simbolo.tipo != Simbolo.EnumTipo.error)
                                 {
-                                    if (!entorno.insertar(removerExtras(root.ChildNodes[0].ToString()), new Simbolo(Simbolo.EnumTipo.arreglo, -1, -1, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Line, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Column, null, size * simbolo.size, simbolo)))
+                                    if (!entorno.insertar(removerExtras(root.ChildNodes[0].ToString()), stmp))
                                     {
                                         Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                         errores.Add(error);
@@ -653,6 +659,37 @@ namespace Proyecto2_Compiladores2.Analizador
                                 }
                             }
                             recorrer(root.ChildNodes[4], entorno);
+                        }
+                    }
+                    break;
+                case "Z_SUBPROGRAMAS":
+                case "SUBPROGRAMA":
+                    if (root.ChildNodes.Count > 0)
+                    {
+                        nombre = removerExtras(root.ChildNodes[0].ChildNodes[0].ChildNodes[0].ToString());
+                        MessageBox.Show(nombre);
+                        simbolo = entorno.buscar(nombre);
+                        if (simbolo is null)
+                        {
+                            Entorno nuevoEntorno = new Entorno(entorno, nombre);
+                            //La variable no existe
+                            if (root.ChildNodes[0].ToString().Equals("PROCEDIMIENTO"))
+                            {
+                                //Es un metodo, no tiene retorno
+                            }
+                            else
+                            {
+                                //Es una funcion, tiene retorno
+                            }
+                        }
+                        if (root.ToString().Equals("Z_SUBPROGRAMAS"))
+                        {
+                            recorrer(root.ChildNodes[1], entorno);
+                            recorrer(root.ChildNodes[2], entorno);
+                        }
+                        else
+                        {
+                            recorrer(root.ChildNodes[1], entorno);
                         }
                     }
                     break;
