@@ -437,7 +437,7 @@ namespace Proyecto2_Compiladores2.Analizador
                             simbolo = entorno.buscar(removerExtras(nombreVariable));
                             if (simbolo is null)
                             {
-                                //AGREGAR ERROR La variable no existe
+                                MessageBox.Show("Error la variable no existe");
                             }
                             else
                             {
@@ -468,7 +468,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                                 }
                                                 else
                                                 {
-                                                    //Error de tipos
+                                                    MessageBox.Show("Error de tipos");
                                                 }
                                             }
                                         }
@@ -531,7 +531,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         }
                                         else
                                         {
-                                            //Error de tipos
+                                            MessageBox.Show("Error de tipos");
                                         }
                                     }
                                 }
@@ -549,7 +549,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     }
                                     else
                                     {
-                                        //Error de tipos
+                                        MessageBox.Show("Error de tipos");
                                     }
                                 }
                             }
@@ -822,7 +822,7 @@ namespace Proyecto2_Compiladores2.Analizador
                 }
                 else
                 {
-                    //ERROR
+                    MessageBox.Show("Error se esperaba funcion o procedimiento");
                 }
             }
         }

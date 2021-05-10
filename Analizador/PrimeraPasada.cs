@@ -112,6 +112,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                      *      var curso1 : curso;
                                      *      var curso2 : curso = curso1; <- aca el error
                                      */
+                                    MessageBox.Show("Error Semantico, Pascal no permite asignacion con variable en la declaracion");
                                 }
                                 if (simbolo is null) { }
                                 else
@@ -122,6 +123,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         {
                                             Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                             errores.Add(error);
+                                            MessageBox.Show("Error Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                         }
                                         else
                                         {
@@ -162,6 +164,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                                         errores.Add(error);
+                                        MessageBox.Show("Error Semantico, El objeto o arreglo no existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                     }
                                     else
                                     {
@@ -210,6 +213,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                             {
                                                 Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                                 errores.Add(error);
+                                                MessageBox.Show("Error Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                             }
                                             else
                                             {
@@ -252,6 +256,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                                         errores.Add(error);
+                                        MessageBox.Show("Error Semantico, El objeto o arreglo no existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                     }
                                     else
                                     {
@@ -304,6 +309,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(temp.ChildNodes[0].ToString()) + " ya existe");
                                         errores.Add(error);
+                                        MessageBox.Show("Error Semantico, El identificador " + removerExtras(temp.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                     }
                                     else
                                     {
@@ -363,6 +369,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                      *      const curso1 : curso;
                                      *      const curso2 : curso = curso1; <- aca el error
                                      */
+                                    MessageBox.Show("Error Semantico, Pascal no permite asignacion con variable en la declaracion");
                                 }
                                 if (simbolo is null) { }
                                 else
@@ -374,6 +381,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         {
                                             Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                             errores.Add(error);
+                                            MessageBox.Show("Error Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                         }
                                         else
                                         {
@@ -419,6 +427,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                      *      const curso1 : curso;
                                      *      const curso2 = curso1; <- aca el error
                                      */
+                                    MessageBox.Show("Error Semantico, Pascal no permite asignacion con variable en la declaracion");
                                 }
                                 if (simbolo is null) { }
                                 else
@@ -430,6 +439,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                         {
                                             Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                             errores.Add(error);
+                                            MessageBox.Show("Error Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                         }
                                         else
                                         {
@@ -495,6 +505,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                 {
                                     Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                                     errores.Add(error);
+                                    MessageBox.Show("Error Semantico, El objeto o arreglo no existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                 }
                                 else
                                 { 
@@ -516,6 +527,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                         errores.Add(error);
+                                        MessageBox.Show("Error Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                     }
                                     else
                                     {
@@ -577,6 +589,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                             {
                                                 Error error = new Error(hijoTemp.ChildNodes[0].Token.Location.Line, hijoTemp.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                                                 errores.Add(error);
+                                                MessageBox.Show("Semantico, El objeto o arreglo no existe" + " L" + hijoTemp.ChildNodes[0].Token.Location.Line + " C" + hijoTemp.ChildNodes[0].Token.Location.Column);
                                             }
                                             else
                                             {
@@ -619,6 +632,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                                 {
                                                     Error error = new Error(hijoTemp.ChildNodes[0].Token.Location.Line, hijoTemp.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(nodoTemp.ChildNodes[0].ToString()) + " ya existe");
                                                     errores.Add(error);
+                                                    MessageBox.Show("Semantico, El identificador " + removerExtras(nodoTemp.ChildNodes[0].ToString()) + " ya existe" + " L" + hijoTemp.ChildNodes[0].Token.Location.Line + " C" + hijoTemp.ChildNodes[0].Token.Location.Column);
                                                 }
                                                 else
                                                 {
@@ -642,6 +656,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                 {
                                     Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe");
                                     errores.Add(error);
+                                    MessageBox.Show("Semantico, El identificador " + removerExtras(root.ChildNodes[0].ToString()) + " ya existe" + " L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                                 }
                                 else
                                 {
@@ -755,6 +770,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         {
                             Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                             errores.Add(error);
+                            MessageBox.Show("Error Semantico, El objeto o arreglo no existe L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                         }
                         else
                         {
@@ -816,6 +832,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         {
                             Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(tempX.ChildNodes[0].ToString()) + " ya existe");
                             errores.Add(error);
+                            MessageBox.Show("Semantico, El objeto o arreglo no existe" + " L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                         }
                         else
                         {
@@ -856,6 +873,7 @@ namespace Proyecto2_Compiladores2.Analizador
                 {
                     Error error = new Error(root.Token.Location.Line, root.Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
                     errores.Add(error);
+                    MessageBox.Show("Semantico, El objeto o arreglo no existe" + " L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                 }
                 else
                 {
@@ -909,6 +927,7 @@ namespace Proyecto2_Compiladores2.Analizador
                 {
                     Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(tempX.ChildNodes[0].ToString()) + " ya existe");
                     errores.Add(error);
+                    MessageBox.Show("Semantico, El objeto o arreglo no existe" + " L" + root.ChildNodes[0].Token.Location.Line + " C" + root.ChildNodes[0].Token.Location.Column);
                 }
                 else
                 {
