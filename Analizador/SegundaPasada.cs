@@ -21,12 +21,13 @@ namespace Proyecto2_Compiladores2.Analizador
         public int contadorEtiqueta;
         private int temporalSwitch;
         private int temporalSalidaSwitch;
-        private int SP, HP;
+        public int SP, HP;
         private string acumulado;
-        public SegundaPasada(int contadorEtiqueta)
+        private Entorno entornoGlobal;
+        public SegundaPasada(int contadorEtiqueta, Entorno entornoGlobal)
         {
             posicionRelativa = 0;
-            declaracion = new Declaracion(0, contadorEtiqueta);
+            declaracion = new Declaracion(0, contadorEtiqueta, entornoGlobal);
             contadorTemporal = 1;
             temporalSwitch = 0;
             temporalSalidaSwitch = 0;
@@ -84,7 +85,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         //      0                1                 2
                         traduccion += "//Inicio de calculo de la expresion condicional de IF" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
-                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno, HP) + Environment.NewLine;
                         traduccion += str;
                         traduccion += "//Fin de calculo de la expresion condicional de IF" + Environment.NewLine;
                         if (declaracion.contadorTemporal > contadorTemporal)
@@ -112,7 +113,7 @@ namespace Proyecto2_Compiladores2.Analizador
                         //      0                1
                         traduccion += "//Inicio de calculo de la expresion condicional de IF" + Environment.NewLine;
                         declaracion.contadorTemporal = 0;
-                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                        str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno, HP) + Environment.NewLine;
                         traduccion += str;
                         traduccion += "//Fin de calculo de la expresion condicional de IF" + Environment.NewLine;
                         if (declaracion.contadorTemporal > contadorTemporal)
@@ -138,7 +139,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "L" + etiquetaInicial + ":" + Environment.NewLine;
                     traduccion += "//Inicio de calculo de la expresion condicional del WHILE" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno) + Environment.NewLine;
+                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno, HP) + Environment.NewLine;
                     traduccion += str;
                     traduccion += "//Fin de calculo de la expresion condicional del WHILE" + Environment.NewLine;
                     if (declaracion.contadorTemporal > contadorTemporal)
@@ -170,7 +171,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     traduccion += "//Fin de instrucciones pertenecientes al bloque REPEAT" + Environment.NewLine;
                     traduccion += "//Inicio de calculo de la expresion condicional del REPEAT" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    str = declaracion.ResolverExpresion(root.ChildNodes[2], entorno) + Environment.NewLine;
+                    str = declaracion.ResolverExpresion(root.ChildNodes[2], entorno, HP) + Environment.NewLine;
                     traduccion += str;
                     traduccion += "//Fin de calculo de la expresion condicional del REPEAT" + Environment.NewLine;
                     if (declaracion.contadorTemporal > contadorTemporal)
@@ -197,9 +198,9 @@ namespace Proyecto2_Compiladores2.Analizador
                     declaracion.contadorTemporal = 0;
                     traduccion += "//Inicio de calculo de la expresion condicional del FOR" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    str = declaracion.ResolverExpresion(root.ChildNodes[1].ChildNodes[0], entorno);
+                    str = declaracion.ResolverExpresion(root.ChildNodes[1].ChildNodes[0], entorno, HP);
                     //tmp = contadorTemporal;
-                    if (!str.StartsWith("T"))
+                    if (!str.StartsWith("T") && !str.StartsWith("S_"))
                     {
                         contadorTemporal++;
                         str = "T" + contadorTemporal + " = " + str;
@@ -239,9 +240,9 @@ namespace Proyecto2_Compiladores2.Analizador
                     //     0       1      2
                     traduccion += "//Inicio de calculo de la expresion del SWITCH" + Environment.NewLine;
                     declaracion.contadorTemporal = 0;
-                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno);
+                    str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno, HP);
                     //tmp = contadorTemporal;
-                    if (!str.StartsWith("T"))
+                    if (!str.StartsWith("T") && !str.StartsWith("S_"))
                     {
                         contadorTemporal++;
                         str = "T" + contadorTemporal + " = " + str;
@@ -270,11 +271,11 @@ namespace Proyecto2_Compiladores2.Analizador
                         {
                             traduccion += "//Inicio de calculo de expresion del CASE" + Environment.NewLine;
                             declaracion.contadorTemporal = 0;
-                            str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno);
+                            str = declaracion.ResolverExpresion(root.ChildNodes[0], entorno, HP);
                             if (declaracion.contadorTemporal > contadorTemporal)
                                 contadorTemporal = declaracion.contadorTemporal;
                             //tmp = contadorTemporal;
-                            if (!str.StartsWith("T"))
+                            if (!str.StartsWith("T") && !str.StartsWith("S_"))
                             {
                                 contadorTemporal++;
                                 str = "T" + contadorTemporal + " = " + str;
@@ -306,7 +307,7 @@ namespace Proyecto2_Compiladores2.Analizador
                     }
                     break;
                 case "LLAMADA":
-                    if (root.ChildNodes[0].ToString().Contains("writeln (id)"))
+                    if (root.ChildNodes[0].ToString().Contains("writeln (id)") || root.ChildNodes[0].ToString().Contains("write (id)"))
                     {
                         if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE") || root.ChildNodes[1].ChildNodes.Count > 1)
                         {
@@ -314,8 +315,8 @@ namespace Proyecto2_Compiladores2.Analizador
                             if (st.tipo != Simbolo.EnumTipo.cadena)
                             {
                                 declaracion.contadorTemporal = 0;
-                                str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno);
-                                if (!str.StartsWith("T"))
+                                str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno, HP);
+                                if (!str.StartsWith("T") && !str.StartsWith("S_"))
                                 {
                                     declaracion.contadorTemporal++;
                                     str = "T" + declaracion.contadorTemporal + " = " + str + Environment.NewLine;
@@ -334,11 +335,20 @@ namespace Proyecto2_Compiladores2.Analizador
                         }
                         else if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("ESTRUCTURA"))
                         {
-                            int[] datos = obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[0], entorno);
-                            acumulado = "";
-                            if (datos != null)
+                            if (!root.ChildNodes[1].ChildNodes[0].ChildNodes[0].ToString().Equals("LLAMADA"))
                             {
-                                imprimirBucle(datos[0], datos[1], Convert.ToBoolean(datos[2]));
+                                int[] datos = obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[0], entorno);
+                                acumulado = "";
+                                if (datos != null)
+                                {
+                                    imprimirBucle(datos[0], datos[1], Convert.ToBoolean(datos[2]));
+                                }
+                            }
+                            else
+                            {
+                                ejecutarLlamada(root.ChildNodes[1].ChildNodes[0].ChildNodes[0]);
+                                traduccion += "printf(\"%f\", HEAP[(int)HP + 0]);" + Environment.NewLine;
+                                traduccion += "HP = S_HP;" + Environment.NewLine;
                             }
                         }
                         else
@@ -360,8 +370,8 @@ namespace Proyecto2_Compiladores2.Analizador
                                 if (sim is null)
                                 {
                                     declaracion.contadorTemporal = 0;
-                                    str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno);
-                                    if (!str.StartsWith("T"))
+                                    str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno, HP);
+                                    if (!str.StartsWith("T") && !str.StartsWith("S_"))
                                     {
                                         declaracion.contadorTemporal++;
                                         str = "T" + declaracion.contadorTemporal + " = " + str + Environment.NewLine;
@@ -401,7 +411,15 @@ namespace Proyecto2_Compiladores2.Analizador
                             }
                             nodoTemporal = nodoTemporal.ChildNodes[1];
                         }
-                        traduccion += "printf(\"%c\", 10);" + Environment.NewLine;
+                        if (root.ChildNodes[0].ToString().Contains("writeln (id)"))
+                        {
+                            traduccion += "printf(\"%c\", 10);" + Environment.NewLine;
+                        }
+                    }
+                    else
+                    {
+                        ejecutarLlamada(root);
+                        traduccion += "HP = S_HP;" + Environment.NewLine;
                     }
                     break;
                 case "BREAK":
@@ -432,7 +450,6 @@ namespace Proyecto2_Compiladores2.Analizador
                                         if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE"))
                                         {
                                             Simbolo sm = entorno.buscar(removerExtras(root.ChildNodes[1].ChildNodes[0].ChildNodes[0].ToString()));
-                                            MessageBox.Show(removerExtras(root.ChildNodes[1].ChildNodes[0].ChildNodes[0].ToString()));
                                             if (!(sm is null))
                                             {
                                                 int[] izquierda = { simbolo.direccionAbsoluta, simbolo.size };
@@ -458,10 +475,10 @@ namespace Proyecto2_Compiladores2.Analizador
                                         else
                                         {
                                             declaracion.contadorTemporal = 0;
-                                            str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+                                            str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno, HP) + Environment.NewLine;
                                             if (declaracion.contadorTemporal > contadorTemporal)
                                                 contadorTemporal = declaracion.contadorTemporal;
-                                            if (!str.StartsWith("T"))
+                                            if (!str.StartsWith("T") && !str.StartsWith("S_"))
                                             {
                                                 contadorTemporal++;
                                                 str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine +
@@ -472,16 +489,33 @@ namespace Proyecto2_Compiladores2.Analizador
                                                 str = "//Inicio de modificacion de identificador " + nombreVariable + Environment.NewLine + str;
                                             }
                                             traduccion += str;
-                                            if (declaracion.contadorTemporal > contadorTemporal)
+                                            if (simbolo.direccionHeap == -1)
                                             {
-                                                contadorTemporal = declaracion.contadorTemporal;
-                                                traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                                if (declaracion.contadorTemporal > contadorTemporal)
+                                                {
+                                                    contadorTemporal = declaracion.contadorTemporal;
+                                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                                }
+                                                else
+                                                {
+                                                    if (declaracion.contadorTemporal == 0)
+                                                        declaracion.contadorTemporal = contadorTemporal;
+                                                    traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                                }
                                             }
                                             else
                                             {
-                                                if (declaracion.contadorTemporal == 0)
-                                                    declaracion.contadorTemporal = contadorTemporal;
-                                                traduccion += "STACK[" + simbolo.direccionAbsoluta + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                                if (declaracion.contadorTemporal > contadorTemporal)
+                                                {
+                                                    contadorTemporal = declaracion.contadorTemporal;
+                                                    traduccion += "HEAP[(int)HP + " + simbolo.direccionRelativa + "] = T" + contadorTemporal + ";" + Environment.NewLine;
+                                                }
+                                                else
+                                                {
+                                                    if (declaracion.contadorTemporal == 0)
+                                                        declaracion.contadorTemporal = contadorTemporal;
+                                                    traduccion += "HEAP[(int)HP + " + simbolo.direccionRelativa + "] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                                }
                                             }
                                             declaracion.contadorTemporal = 0;
                                         }
@@ -490,7 +524,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                     {
                                         int[] derecha = obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[0], entorno);
                                         acumulado = "";
-                                        int[] izquierda = {simbolo.direccionAbsoluta, simbolo.size};
+                                        int[] izquierda = { simbolo.direccionAbsoluta, simbolo.size };
                                         if (izquierda[1] == derecha[1])
                                         {
                                             asignacionBucle(izquierda, derecha, simbolo.direccionHeap, derecha[2]);
@@ -606,14 +640,14 @@ namespace Proyecto2_Compiladores2.Analizador
                                                 //El resultado final de la parte izquierda es de tipo integer, real o boolean
                                                 if (!root.ChildNodes[1].ChildNodes[0].ToString().Contains("cadena"))
                                                 {
-                                                    declaracion = new Declaracion(0, contadorEtiqueta);
+                                                    declaracion = new Declaracion(0, contadorEtiqueta, entornoGlobal);
                                                     declaracion.contadorTemporal = 0;
-                                                    str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno) + Environment.NewLine;
+                                                    str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno, HP) + Environment.NewLine;
 
                                                     if (declaracion.contadorTemporal > contadorTemporal)
                                                         contadorTemporal = declaracion.contadorTemporal;
 
-                                                    if (!str.StartsWith("T"))
+                                                    if (!str.StartsWith("T") && !str.StartsWith("S_"))
                                                     {
                                                         contadorTemporal++;
                                                         str = "//Inicio de modificacion de identificador " + Environment.NewLine +
@@ -662,6 +696,136 @@ namespace Proyecto2_Compiladores2.Analizador
                     break;
             }
         }
+        private void ejecutarLlamada(ParseTreeNode root)
+        {
+            string nombre = removerExtras(root.ChildNodes[0].ToString());
+            Simbolo sim = entorno.buscar(nombre);
+            string str = "";
+            if (!(sim is null))
+            {
+                if (sim.tipo == Simbolo.EnumTipo.procedimiento || sim.tipo == Simbolo.EnumTipo.funcion)
+                {
+                    int suma = 0;
+                    Entorno eTmp = entorno;
+                    while (eTmp.anterior != null)
+                    {
+                        eTmp = eTmp.anterior;
+                    }
+                    foreach (KeyValuePair<string, Simbolo> t in eTmp.tabla)
+                    {
+                        suma += t.Value.size;
+                    }
+                    traduccion += "S_HP = HP;" + Environment.NewLine;
+                    traduccion += "HP = " + suma + ";" + Environment.NewLine;
+                    if (root.ChildNodes.Count > 1)
+                    {
+                        if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE") || root.ChildNodes[1].ChildNodes.Count > 1 || (root.ChildNodes[1].ChildNodes[0].ChildNodes.Count > 1 && !root.ChildNodes[1].ChildNodes[0].ToString().Equals("ESTRUCTURA")))
+                        {
+                            Simbolo simX = null;
+                            if (root.ChildNodes[1].ChildNodes[0].ToString().Equals("VARIABLE"))
+                            {
+                                simX = entorno.buscar(removerExtras(root.ChildNodes[1].ChildNodes[0].ChildNodes[0].ToString()));
+                                if (simX.tipo != Simbolo.EnumTipo.cadena)
+                                    simX = null;
+                            }
+                            if (simX is null)
+                            {
+                                declaracion.contadorTemporal = 0;
+                                str = declaracion.ResolverExpresion(root.ChildNodes[1], entorno, HP);
+                                if (!str.StartsWith("T") && !str.StartsWith("S_"))
+                                {
+                                    declaracion.contadorTemporal++;
+                                    str = "T" + declaracion.contadorTemporal + " = " + str + Environment.NewLine;
+                                }
+                                if (declaracion.contadorTemporal > contadorTemporal)
+                                {
+                                    contadorTemporal = declaracion.contadorTemporal;
+                                }
+                                traduccion += str + Environment.NewLine;
+                                //Es un numero o boolean, puede ser un objeto o un arreglo
+                            }
+                            else
+                            {
+                                bool tipo = false;
+                                if (simX.tipo == Simbolo.EnumTipo.cadena)
+                                {
+                                    traduccion += "HEAP[(int)HP + 1] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                }
+                                else
+                                {
+                                    traduccion += "HEAP[(int)HP + 1] = T" + declaracion.contadorTemporal + ";" + Environment.NewLine;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            str = removerExtras(root.ChildNodes[1].ChildNodes[0].ToString());
+                            if (str.Equals(""))
+                            {
+                                str = " ";
+                            }
+                            //Es un valor
+                            traduccion += "HEAP[(int)HP + 1] = " + str + ";" + Environment.NewLine;
+                        }
+
+                        ParseTreeNode nodoTemporal = root.ChildNodes[2];
+                        while (nodoTemporal.ChildNodes.Count > 0)
+                        {
+                            if (nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("VARIABLE") || nodoTemporal.ChildNodes[0].ChildNodes.Count > 1 || (nodoTemporal.ChildNodes[0].ChildNodes[0].ChildNodes.Count > 1 && !nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("ESTRUCTURA")))
+                            {
+                                Simbolo simX = null;
+                                if (nodoTemporal.ChildNodes[0].ChildNodes[0].ToString().Equals("VARIABLE"))
+                                {
+                                    simX = entorno.buscar(removerExtras(nodoTemporal.ChildNodes[0].ChildNodes[0].ChildNodes[0].ToString()));
+                                    if (simX.tipo != Simbolo.EnumTipo.cadena)
+                                        simX = null;
+                                }
+                                if (simX is null)
+                                {
+                                    declaracion.contadorTemporal = 0;
+                                    str = declaracion.ResolverExpresion(nodoTemporal.ChildNodes[0], entorno, HP);
+                                    if (!str.StartsWith("T") && !str.StartsWith("S_"))
+                                    {
+                                        declaracion.contadorTemporal++;
+                                        str = "T" + declaracion.contadorTemporal + " = " + str + Environment.NewLine;
+                                    }
+                                    if (declaracion.contadorTemporal > contadorTemporal)
+                                    {
+                                        contadorTemporal = declaracion.contadorTemporal;
+                                    }
+                                    traduccion += str + Environment.NewLine;
+                                    //Es un numero o boolean, puede ser un objeto o un arreglo
+                                }
+                                else
+                                {
+                                    bool tipo = false;
+                                    if (simX.tipo == Simbolo.EnumTipo.cadena)
+                                        tipo = true;
+                                    //Es una cadena
+                                }
+                            }
+                            else
+                            {
+                                str = removerExtras(nodoTemporal.ChildNodes[0].ChildNodes[0].ToString());
+                                if (str.Equals(""))
+                                {
+                                    str = " ";
+                                }
+                                //Es un valor
+                            }
+                            nodoTemporal = nodoTemporal.ChildNodes[1];
+                        }
+                    }
+                    //traduccion += "HEAP[(int)HP + 1] = 6;" + Environment.NewLine;
+                    traduccion += "HP = HP + S_HP;" + Environment.NewLine;
+                    traduccion += nombre + "();" + Environment.NewLine;
+                }
+                else
+                {
+                    //ERROR
+                }
+            }
+        }
         private void asignacionBucle(int[] izquierda, int[] derecha, int lugarIzquierda, int lugarDerecha)
         {
             int etiquetaInicial;
@@ -685,7 +849,7 @@ namespace Proyecto2_Compiladores2.Analizador
             traduccion += "if (T" + tmpContadorIzquierda + " < " + (izquierda[0] + izquierda[1]) + ") goto L" + etiquetaVerdadera + ";" + Environment.NewLine;
             traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
             traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
-            if(lugarDerecha == -1)
+            if (lugarDerecha == -1)
                 traduccion += "T" + contadorTemporal + " = STACK[(int)T" + tmpContadorDerecha + "];" + Environment.NewLine;
             else
                 traduccion += "T" + contadorTemporal + " = HEAP[(int)T" + tmpContadorDerecha + "];" + Environment.NewLine;
@@ -718,7 +882,7 @@ namespace Proyecto2_Compiladores2.Analizador
             traduccion += "if (T" + tempTemo + " < " + (direccionHeap + size) + ") goto L" + etiquetaVerdadera + ";" + Environment.NewLine;
             traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
             traduccion += "L" + etiquetaVerdadera + ":" + Environment.NewLine;
-            traduccion += "T" + contadorTemporal + " = " + "HEAP[(int)T" + tempTemo + "];" + Environment.NewLine;
+            traduccion += "T" + contadorTemporal + " = " + "HEAP[(int)HP + (int)T" + tempTemo + "];" + Environment.NewLine;
             int tempSt = contadorTemporal;
             contadorTemporal++;
             traduccion += "if (T" + tempSt + " != -201700893) goto L" + contadorEtiqueta + ";" + Environment.NewLine;
@@ -726,7 +890,7 @@ namespace Proyecto2_Compiladores2.Analizador
             contadorEtiqueta++;
             traduccion += "goto L" + etiquetaFalsa + ";" + Environment.NewLine;
             traduccion += "L" + tmpEt + ":" + Environment.NewLine;
-            if(cadena)
+            if (cadena)
                 traduccion += "printf(\"%c\", (int)T" + tempSt + ");" + Environment.NewLine;
             else
                 traduccion += "printf(\"%f\", T" + tempSt + ");" + Environment.NewLine;
@@ -738,76 +902,83 @@ namespace Proyecto2_Compiladores2.Analizador
         {
             //Recibimos un nodo tipo ESTRUCTURA
             int[] retorno = new int[3];
-            string nombreVariable = acumulado + removerExtras(root.ChildNodes[0].ToString()); //Nombre de la variable a buscar
-            Simbolo variable = entorno.buscar(nombreVariable);
-            if (variable is null)
+            if (!root.ChildNodes[0].ToString().Equals("LLAMADA"))
             {
-                int sizTemp = -1;
-                int posTemp = -1;
-                foreach (KeyValuePair<string, Simbolo> pair in entorno.tabla)
+                string nombreVariable = acumulado + removerExtras(root.ChildNodes[0].ToString()); //Nombre de la variable a buscar
+                Simbolo variable = entorno.buscar(nombreVariable);
+                if (variable is null)
                 {
-                    if (pair.Key.Contains(nombreVariable))
+                    int sizTemp = -1;
+                    int posTemp = -1;
+                    foreach (KeyValuePair<string, Simbolo> pair in entorno.tabla)
                     {
-                        if (sizTemp == -1)
+                        if (pair.Key.Contains(nombreVariable))
                         {
-                            sizTemp = pair.Value.size;
-                            posTemp += pair.Value.direccionAbsoluta + 1;
+                            if (sizTemp == -1)
+                            {
+                                sizTemp = pair.Value.size;
+                                posTemp += pair.Value.direccionAbsoluta + 1;
+                            }
+                            else
+                            {
+                                sizTemp += pair.Value.size;
+                            }
+                            MessageBox.Show("Variable: " + pair.Key + Environment.NewLine + "Posicion absoluta: " + posTemp + Environment.NewLine + "Size: " + sizTemp);
                         }
-                        else
-                        {
-                            sizTemp += pair.Value.size;
-                        }
-                        MessageBox.Show("Variable: " + pair.Key + Environment.NewLine + "Posicion absoluta: " + posTemp + Environment.NewLine + "Size: " + sizTemp);
                     }
+                    retorno[0] = posTemp; //Posicion inicial
+                    retorno[1] = sizTemp; //Size
+                    retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                    if (posTemp != -1)
+                        return retorno;
+                    return null;
                 }
-                retorno[0] = posTemp; //Posicion inicial
-                retorno[1] = sizTemp; //Size
-                retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
-                if (posTemp != -1)
-                    return retorno;
-                return null;
-            }
-            if (variable.tipo == Simbolo.EnumTipo.arreglo && root.ChildNodes.Count == 4)
-            {
-                //Es un arreglo y ESTRUCTURA representa a un arreglo
-                int limiteInferior, limiteSuperior;
-                limiteInferior = int.Parse(variable.limiteInferior[0].ToString());
-                limiteSuperior = int.Parse(variable.limiteSuperior[0].ToString());
+                if (variable.tipo == Simbolo.EnumTipo.arreglo && root.ChildNodes.Count == 4)
+                {
+                    //Es un arreglo y ESTRUCTURA representa a un arreglo
+                    int limiteInferior, limiteSuperior;
+                    limiteInferior = int.Parse(variable.limiteInferior[0].ToString());
+                    limiteSuperior = int.Parse(variable.limiteSuperior[0].ToString());
 
-            }
-            else if (variable.tipo == Simbolo.EnumTipo.objeto && root.ChildNodes.Count == 2)
-            {
-                //Es un objeto y ESTRUCTURA representa a un objeto
-                if (root.ChildNodes[1].ChildNodes.Count > 0)
-                {
-                    if (root.ChildNodes[1].ChildNodes[1].ChildNodes.Count > 0)
-                    {
-                        acumulado = removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + ".";
-                        return obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[1], variable.atributos);
-                    }
-                    return obtenerDatosEstructura(root.ChildNodes[1], variable.atributos);
                 }
-                retorno[0] = variable.direccionAbsoluta; //Posicion inicial
-                retorno[1] = variable.size; //Size
-                retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                else if (variable.tipo == Simbolo.EnumTipo.objeto && root.ChildNodes.Count == 2)
+                {
+                    //Es un objeto y ESTRUCTURA representa a un objeto
+                    if (root.ChildNodes[1].ChildNodes.Count > 0)
+                    {
+                        if (root.ChildNodes[1].ChildNodes[1].ChildNodes.Count > 0)
+                        {
+                            acumulado = removerExtras(root.ChildNodes[1].ChildNodes[0].ToString()) + ".";
+                            return obtenerDatosEstructura(root.ChildNodes[1].ChildNodes[1], variable.atributos);
+                        }
+                        return obtenerDatosEstructura(root.ChildNodes[1], variable.atributos);
+                    }
+                    retorno[0] = variable.direccionAbsoluta; //Posicion inicial
+                    retorno[1] = variable.size; //Size
+                    retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                }
+                else
+                {
+                    if (root.ChildNodes[1].ChildNodes.Count > 0)
+                        return null;
+                    if (acumulado != "")
+                    {
+                        //MessageBox.Show("Posicion absoluta: " + variable.direccionAbsoluta + Environment.NewLine + "Size: " + variable.size);
+                    }
+                    if (variable.direccionHeap == -1)
+                        retorno[0] = variable.direccionAbsoluta; //Posicion inicial
+                    else
+                        retorno[0] = variable.direccionHeap;
+                    retorno[1] = variable.size; //Size
+                    if (variable.tipo == Simbolo.EnumTipo.cadena)
+                        retorno[2] = 1; //Es cadena 0 -> no | 1 -> si
+                    else
+                        retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                }
             }
             else
             {
-                if (root.ChildNodes[1].ChildNodes.Count > 0)
-                    return null;
-                if (acumulado != "")
-                {
-                    //MessageBox.Show("Posicion absoluta: " + variable.direccionAbsoluta + Environment.NewLine + "Size: " + variable.size);
-                }
-                if (variable.direccionHeap == -1)
-                    retorno[0] = variable.direccionAbsoluta; //Posicion inicial
-                else
-                    retorno[0] = variable.direccionHeap;
-                retorno[1] = variable.size; //Size
-                if (variable.tipo == Simbolo.EnumTipo.cadena)
-                    retorno[2] = 1; //Es cadena 0 -> no | 1 -> si
-                else
-                    retorno[2] = 0; //Es cadena 0 -> no | 1 -> si
+                MessageBox.Show("ES UNA LLAMADA");
             }
             return retorno;
         }

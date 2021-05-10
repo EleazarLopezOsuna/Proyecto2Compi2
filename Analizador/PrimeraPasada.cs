@@ -55,6 +55,7 @@ namespace Proyecto2_Compiladores2.Analizador
                 case "Z_DECLARACIONES":
                 case "Z_VARIABLES":
                 case "Z_CONSTANTES":
+                case "PF":
                     if (root.ChildNodes.Count > 0)
                     {
                         foreach (ParseTreeNode hijo in root.ChildNodes)
@@ -171,8 +172,6 @@ namespace Proyecto2_Compiladores2.Analizador
                                             int indiceTemp = posicionHeap;
                                             foreach (KeyValuePair<string, Simbolo> pair in tmpSim.atributos.tabla)
                                             {
-                                                //posicionHeap++;
-                                                //dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, pair.Value.direccionRelativa, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
                                                 if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
                                                 {
                                                     int indiceTemporal = posicionHeap + 1;
@@ -368,7 +367,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                 if (simbolo is null) { }
                                 else
                                 {
-                                    simbolo.constante = true;
+                                    simbolo.rol = "Constante";
                                     if (simbolo.tipo != Simbolo.EnumTipo.error)
                                     {
                                         if (!entorno.insertar(removerExtras(root.ChildNodes[0].ToString()), simbolo))
@@ -424,7 +423,7 @@ namespace Proyecto2_Compiladores2.Analizador
                                 if (simbolo is null) { }
                                 else
                                 {
-                                    simbolo.constante = true;
+                                    simbolo.rol = "Constante";
                                     if (simbolo.tipo != Simbolo.EnumTipo.error)
                                     {
                                         if (!entorno.insertar(removerExtras(root.ChildNodes[0].ToString()), simbolo))
@@ -507,7 +506,7 @@ namespace Proyecto2_Compiladores2.Analizador
                             {
                                 Simbolo stmp = new Simbolo(Simbolo.EnumTipo.arreglo, -1, -1, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Line, root.ChildNodes[2].ChildNodes[3].ChildNodes[0].Token.Location.Column, null, size * simbolo.size, simbolo)
                                 {
-                                    constante = false,
+                                    rol = "Variable",
                                     limiteInferior = inferiores,
                                     limiteSuperior = superiores
                                 };
@@ -659,20 +658,62 @@ namespace Proyecto2_Compiladores2.Analizador
                     if (root.ChildNodes.Count > 0)
                     {
                         nombre = removerExtras(root.ChildNodes[0].ChildNodes[0].ChildNodes[0].ToString());
-                        MessageBox.Show(nombre);
                         simbolo = entorno.buscar(nombre);
                         if (simbolo is null)
                         {
-                            Entorno nuevoEntorno = new Entorno(entorno, nombre);
+                            Entorno nuevoEntorno = new Entorno(entorno, nombre.ToLower());
                             //La variable no existe
                             if (root.ChildNodes[0].ToString().Equals("PROCEDIMIENTO"))
                             {
                                 //Es un metodo, no tiene retorno
+                                simbolo = new Simbolo(Simbolo.EnumTipo.procedimiento, -1, -1, root.ChildNodes[0].ChildNodes[0].ChildNodes[0].Token.Location.Line, root.ChildNodes[0].ChildNodes[0].ChildNodes[0].Token.Location.Line, root.ChildNodes[0].ChildNodes[2]);
+                                PrimeraPasada pp = new PrimeraPasada();
+                                if (root.ChildNodes[0].ChildNodes[0].ChildNodes.Count > 1)
+                                {
+                                    pp.recorrer(root.ChildNodes[0].ChildNodes[0].ChildNodes[1], nuevoEntorno);
+                                    pp.recorrer(root.ChildNodes[0].ChildNodes[0].ChildNodes[2], nuevoEntorno);
+                                }
+                                pp.recorrer(root.ChildNodes[0].ChildNodes[1], nuevoEntorno);
+                                int suma = 0;
+                                foreach (KeyValuePair<string, Simbolo> t in nuevoEntorno.tabla)
+                                {
+                                    t.Value.direccionRelativa = suma;
+                                    t.Value.direccionHeap = 1;
+                                    suma += t.Value.size;
+                                }
+                                simbolo.size = suma;
+                                simbolo.rol = "Procedimiento";
+                                simbolo.direccionHeap = 25;
                             }
                             else
                             {
                                 //Es una funcion, tiene retorno
+                                simbolo = new Simbolo(Simbolo.EnumTipo.funcion, -1, -1, root.ChildNodes[0].ChildNodes[0].ChildNodes[0].Token.Location.Line, root.ChildNodes[0].ChildNodes[0].ChildNodes[0].Token.Location.Line, root.ChildNodes[0].ChildNodes[2]);
+                                PrimeraPasada pp = new PrimeraPasada();
+                                if (root.ChildNodes[0].ChildNodes[0].ChildNodes.Count == 4)
+                                {
+                                    agregarRetorno(root.ChildNodes[0].ChildNodes[0].ChildNodes[3], nuevoEntorno, nombre);
+                                    pp.recorrer(root.ChildNodes[0].ChildNodes[0].ChildNodes[1], nuevoEntorno);
+                                    pp.recorrer(root.ChildNodes[0].ChildNodes[0].ChildNodes[2], nuevoEntorno);
+                                }
+                                else
+                                {
+                                    agregarRetorno(root.ChildNodes[0].ChildNodes[0].ChildNodes[1], nuevoEntorno, nombre);
+                                }
+                                pp.recorrer(root.ChildNodes[0].ChildNodes[1], nuevoEntorno);
+                                int suma = 0;
+                                foreach (KeyValuePair<string, Simbolo> t in nuevoEntorno.tabla)
+                                {
+                                    t.Value.direccionRelativa = suma;
+                                    t.Value.direccionHeap = 1;
+                                    suma += t.Value.size;
+                                }
+                                simbolo.size = suma;
+                                simbolo.rol = "Funcion";
+                                simbolo.direccionHeap = 25;
                             }
+                            simbolo.atributos = nuevoEntorno;
+                            entorno.insertar(nombre, simbolo);
                         }
                         if (root.ToString().Equals("Z_SUBPROGRAMAS"))
                         {
@@ -685,6 +726,195 @@ namespace Proyecto2_Compiladores2.Analizador
                         }
                     }
                     break;
+                case "PFVL":
+                case "PFVR":
+                    ParseTreeNode tempX = root;
+                    if (root.ChildNodes[2].ToString().Contains("real"))
+                    {
+                        simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
+                    }
+                    else if (root.ChildNodes[2].ToString().Contains("boolean"))
+                    {
+                        simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
+                    }
+                    else if (root.ChildNodes[2].ToString().Contains("integer"))
+                    {
+                        simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
+                    }
+                    else if (root.ChildNodes[2].ToString().Contains("string"))
+                    {
+                        simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null);
+                        simbolo.size = 64;
+                        simbolo.direccionHeap = posicionHeap;
+                        posicionHeap += 64;
+                    }
+                    else if (root.ChildNodes[2].ToString().Contains("id"))
+                    {
+                        Expresion tmp = buscarVariable(root.ChildNodes[2].ChildNodes[0], entorno);
+                        if (tmp.tipo == Simbolo.EnumTipo.error)
+                        {
+                            Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
+                            errores.Add(error);
+                        }
+                        else
+                        {
+                            Simbolo tmpSim = entorno.buscar(removerExtras(root.ChildNodes[1].ToString()));
+                            if (tmp.tipo == Simbolo.EnumTipo.objeto)
+                            {
+                                Dictionary<string, Simbolo> dicTemp = new Dictionary<string, Simbolo>();
+                                int indiceTemp = posicionHeap;
+                                int contadory = 0;
+                                foreach (KeyValuePair<string, Simbolo> pair in tmpSim.atributos.tabla)
+                                {
+                                    if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
+                                    {
+                                        foreach (KeyValuePair<string, Simbolo> pareja in pair.Value.atributos.tabla)
+                                        {
+                                            dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, contadory, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
+                                            posicionHeap += pareja.Value.size;
+                                            contadory += pareja.Value.size;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
+                                        posicionHeap += pair.Value.size;
+                                        contadory += pair.Value.size;
+                                    }
+                                }
+                                Entorno entornoTemp = new Entorno(tmpSim.atributos.anterior, tmpSim.atributos.nombreEntorno);
+                                entornoTemp.tabla = dicTemp;
+                                simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, contadory, entornoTemp, indiceTemp);
+                            }
+                            else
+                            {
+                                simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, null, tmpSim.size, tmpSim.contenido)
+                                {
+                                    direccionHeap = posicionHeap,
+                                    limiteInferior = tmpSim.limiteInferior,
+                                    limiteSuperior = tmpSim.limiteSuperior
+                                };
+                                posicionHeap += simbolo.size;
+                            }
+                        }
+                    }
+                    if (simbolo is null)
+                    {
+                    }
+                    else
+                    {
+                        if (root.ToString().Equals("PFVL"))
+                        {
+                            simbolo.tipoParametro = 1;
+                        }
+                        else
+                        {
+                            simbolo.tipoParametro = 2;
+                        }
+                        simbolo.rol = "Parametro";
+                        if (!entorno.insertar(removerExtras(tempX.ChildNodes[0].ToString()), simbolo))
+                        {
+                            Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(tempX.ChildNodes[0].ToString()) + " ya existe");
+                            errores.Add(error);
+                        }
+                        else
+                        {
+                            posicionAbsoluta++;
+                            posicionRelativa++;
+                        }
+                    }
+                    break;
+            }
+        }
+        private void agregarRetorno(ParseTreeNode root, Entorno entorno, string nombreSubPrograma)
+        {
+            ParseTreeNode tempX = root;
+            Simbolo simbolo = null;
+            if (root.ToString().Contains("real"))
+            {
+                simbolo = new Simbolo(Simbolo.EnumTipo.real, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null);
+            }
+            else if (root.ToString().Contains("boolean"))
+            {
+                simbolo = new Simbolo(Simbolo.EnumTipo.boleano, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null);
+            }
+            else if (root.ToString().Contains("integer"))
+            {
+                simbolo = new Simbolo(Simbolo.EnumTipo.entero, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null);
+            }
+            else if (root.ToString().Contains("string"))
+            {
+                simbolo = new Simbolo(Simbolo.EnumTipo.cadena, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null);
+                simbolo.size = 64;
+                simbolo.direccionHeap = posicionHeap;
+                posicionHeap += 64;
+            }
+            else if (root.ToString().Contains("id"))
+            {
+                Expresion tmp = buscarVariable(root, entorno);
+                if (tmp.tipo == Simbolo.EnumTipo.error)
+                {
+                    Error error = new Error(root.Token.Location.Line, root.Token.Location.Column, "Semantico", "El objeto o arreglo no existe");
+                    errores.Add(error);
+                }
+                else
+                {
+                    Simbolo tmpSim = entorno.buscar(removerExtras(root.ToString()));
+                    if (tmp.tipo == Simbolo.EnumTipo.objeto)
+                    {
+                        Dictionary<string, Simbolo> dicTemp = new Dictionary<string, Simbolo>();
+                        int indiceTemp = posicionHeap;
+                        int contadory = 0;
+                        foreach (KeyValuePair<string, Simbolo> pair in tmpSim.atributos.tabla)
+                        {
+                            if (pair.Value.tipo == Simbolo.EnumTipo.objeto)
+                            {
+                                foreach (KeyValuePair<string, Simbolo> pareja in pair.Value.atributos.tabla)
+                                {
+                                    dicTemp.Add(pair.Key + "." + pareja.Key, new Simbolo(pareja.Value.tipo, posicionHeap, contadory, pareja.Value.fila, pareja.Value.columna, pareja.Value.root, pareja.Value.size, pareja.Value.atributos, -1));
+                                    posicionHeap += pareja.Value.size;
+                                    contadory += pareja.Value.size;
+                                }
+                            }
+                            else
+                            {
+                                dicTemp.Add(pair.Key, new Simbolo(pair.Value.tipo, posicionHeap, contadory, pair.Value.fila, pair.Value.columna, pair.Value.root, pair.Value.size, pair.Value.atributos, -1));
+                                posicionHeap += pair.Value.size;
+                                contadory += pair.Value.size;
+                            }
+                        }
+                        Entorno entornoTemp = new Entorno(tmpSim.atributos.anterior, tmpSim.atributos.nombreEntorno);
+                        entornoTemp.tabla = dicTemp;
+                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null, contadory, entornoTemp, indiceTemp);
+                    }
+                    else
+                    {
+                        simbolo = new Simbolo(tmp.tipo, posicionAbsoluta, posicionRelativa, root.Token.Location.Line, root.Token.Location.Column, null, tmpSim.size, tmpSim.contenido)
+                        {
+                            direccionHeap = posicionHeap,
+                            limiteInferior = tmpSim.limiteInferior,
+                            limiteSuperior = tmpSim.limiteSuperior
+                        };
+                        posicionHeap += simbolo.size;
+                    }
+                }
+            }
+            if (simbolo is null)
+            {
+            }
+            else
+            {
+                simbolo.rol = "Retorno";
+                if (!entorno.insertar(nombreSubPrograma, simbolo))
+                {
+                    Error error = new Error(root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, "Semantico", "El identificador " + removerExtras(tempX.ChildNodes[0].ToString()) + " ya existe");
+                    errores.Add(error);
+                }
+                else
+                {
+                    posicionAbsoluta++;
+                    posicionRelativa++;
+                }
             }
         }
         private string removerExtras(string token)

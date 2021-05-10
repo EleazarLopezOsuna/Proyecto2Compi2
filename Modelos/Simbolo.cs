@@ -11,7 +11,7 @@ namespace Proyecto2_Compiladores2.Modelos
         public EnumTipo tipo;
         public int fila;
         public int columna;
-        public bool constante;
+        public string rol;
         public int direccionAbsoluta;
         public int direccionRelativa;
         public int size;
@@ -26,7 +26,7 @@ namespace Proyecto2_Compiladores2.Modelos
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root)
         {
             this.tipo = tipo;
-            constante = false;
+            rol = "Variable";
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
@@ -41,7 +41,7 @@ namespace Proyecto2_Compiladores2.Modelos
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Simbolo contenido)
         {
             this.tipo = tipo;
-            constante = false;
+            rol = "Variable";
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
@@ -57,7 +57,7 @@ namespace Proyecto2_Compiladores2.Modelos
         public Simbolo(EnumTipo tipo, int direccionAbsoluta, int direccionRelativa, int fila, int columna, ParseTreeNode root, int size, Entorno atributos, int direccionHeap)
         {
             this.tipo = tipo;
-            constante = false;
+            rol = "Variable";
             this.direccionAbsoluta = direccionAbsoluta;
             this.direccionRelativa = direccionRelativa;
             this.fila = fila;
