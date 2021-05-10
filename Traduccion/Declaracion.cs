@@ -693,13 +693,14 @@ namespace Proyecto2_Compiladores2.Traduccion
                                     str = " ";
                                 }
                                 //Es un valor
+                                traduccion += "HEAP[(int)HP + 2] = " + str + ";" + Environment.NewLine;
                             }
                             nodoTemporal = nodoTemporal.ChildNodes[1];
                         }
                     }
                     //traduccion += "HEAP[(int)HP + 1] = 6;" + Environment.NewLine;
                     traduccion += "HP = HP + S_HP;" + Environment.NewLine;
-                    traduccion += nombre + "();" + Environment.NewLine;
+                    traduccion += nombre.ToLower() + "();" + Environment.NewLine;
                 }
                 else
                 {
@@ -785,13 +786,13 @@ namespace Proyecto2_Compiladores2.Traduccion
                 if (!operador1.StartsWith("T") && !operador1.StartsWith("S_"))
                 {
                     contadorTemporal++;
-                    operador1 = "T" + contadorTemporal + " = " + operador1;
+                    operador1 = "T" + contadorTemporal + " = " + operador1 + ";";
                 }
                 contadorTemporal++;
                 string operador = removerExtras(root.ChildNodes[0].ToString());
                 if (operador.ToLower().Equals("not"))
                     operador = "!";
-                traduccion += "T" + contadorTemporal + " = " + operador + "T" + (contadorTemporal - 1);
+                traduccion += "T" + contadorTemporal + " = " + operador + "T" + (contadorTemporal - 1) + ";";
             }
             return traduccion;
         }

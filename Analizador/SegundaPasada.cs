@@ -812,13 +812,14 @@ namespace Proyecto2_Compiladores2.Analizador
                                     str = " ";
                                 }
                                 //Es un valor
+                                traduccion += "HEAP[(int)HP + 2] = " + str + ";" + Environment.NewLine;
                             }
                             nodoTemporal = nodoTemporal.ChildNodes[1];
                         }
                     }
                     //traduccion += "HEAP[(int)HP + 1] = 6;" + Environment.NewLine;
                     traduccion += "HP = HP + S_HP;" + Environment.NewLine;
-                    traduccion += nombre + "();" + Environment.NewLine;
+                    traduccion += nombre.ToLower() + "();" + Environment.NewLine;
                 }
                 else
                 {

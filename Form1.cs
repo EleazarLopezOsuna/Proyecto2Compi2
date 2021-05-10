@@ -84,7 +84,7 @@ namespace Proyecto2_Compiladores2
                         cuerpo += segundaPasada.traduccion;
                         cuerpo += "return;" + Environment.NewLine +
                             "}";
-                        for (int i = 1; i <= contadorTemporal; i++)
+                        for (int i = 0; i <= contadorTemporal; i++)
                         {
                             if (i == 1)
                                 encabezado += "T" + i;
