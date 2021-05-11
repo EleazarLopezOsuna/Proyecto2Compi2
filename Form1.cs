@@ -86,7 +86,7 @@ namespace Proyecto2_Compiladores2
                             "}";
                         for (int i = 0; i <= contadorTemporal; i++)
                         {
-                            if (i == 1)
+                            if (i == 0)
                                 encabezado += "T" + i;
                             else
                                 encabezado += ", T" + i;
